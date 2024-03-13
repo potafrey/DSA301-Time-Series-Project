@@ -1,0 +1,52 @@
+# Installing Packages
+```{r}
+library(httr)
+library(jsonlite)
+library(pageviews)
+library(fpp2)
+library(dplyr)
+library(lubridate)
+```
+# Project is about US presidential election, looking at page views and trying to predict web traffic
+```{r}
+2008
+Barack Obama (Democrat, Winner) and Joe Biden (Running Mate)
+John McCain (Republican) and Sarah Palin (Running Mate)
+
+2012
+Barack Obama (Democrat, Winner) and Joe Biden (Running Mate)
+Mitt Romney (Republican) and Paul Ryan (Running Mate)
+
+2016
+Donald Trump (Republican, Winner) and Mike Pence (Running Mate)
+Hillary Clinton (Democrat) and Tim Kaine (Running Mate)
+
+2020
+Joe Biden (Democrat, Winner) and Kamala Harris (Running Mate)
+Donald Trump (Republican) and Mike Pence (Running Mate)
+
+Election-Related Pages
+In addition to the candidate pages, consider analyzing traffic to pages related to the elections themselves and key issues that were prominent during those times:
+
+Pages for each election (e.g., "2008 United States presidential election", "2012 United States presidential election", etc.).
+Key political and election issues (e.g., "Healthcare reform in the United States", "United States foreign policy", "Climate change policy of the United States", "Immigration policy of Donald Trump", etc.) during the election years.
+Political party pages (e.g., "Democratic Party (United States)", "Republican Party (United States)").
+```
+
+
+# Page Views from January 2008 to July 2016
+```{r}
+enwiki_1_october_pageviews <- project_pageviews()
+enwiki_hourly <- project_pageviews(granularity = "daily", end = "2015100123")
+
+enwiki_hourly
+
+old_pageviews(
+  project = "en.wikipedia",
+  platform = "all",
+  granularity = "daily",
+  start = "2015100100",
+  end = "2015101200"
+)
+```
+
