@@ -48,5 +48,36 @@ old_pageviews(
   start = "2015100100",
   end = "2015101200"
 )
+# Basic example
+r_pageviews <- article_pageviews()
+
+# 2008
+## Democrats
+
+# Obama announced that he would run for president in Feb 2007
+obama_pageviews <- article_pageviews(
+  article = "Barack_Obama",
+  granularity = "daily",
+  start = "2007020100",
+  end = "2016120100"
+)
+
+obama_pageviews
+
+biden_pageviews <- article_pageviews(
+  article = "Joe_Biden",
+  granularity = "daily",
+  start = "2015100100",
+  end = "2015100200"
+)
+biden_pageviews
+
+## Republicans
+
+# 2012
+
+# 2016
+
+# 2020
 ```
 
