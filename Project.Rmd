@@ -41,6 +41,7 @@ enwiki_1_october_pageviews <- project_pageviews()
 enwiki_hourly <- project_pageviews(granularity = "daily", end = "2015100123")
 
 enwiki_hourly
+old_pageviews looks at data from January 2008 to July 2016
 
 old_pageviews(
   project = "en.wikipedia",
@@ -49,29 +50,52 @@ old_pageviews(
   start = "2015100100",
   end = "2015101200"
 )
+
+
 # Basic example
 r_pageviews <- article_pageviews()
+pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
 
 # 2008
 ## Democrats
 
 # Obama announced that he would run for president in Feb 2007
-obama_pageviews <- article_pageviews(
+
+# obama_pageviews <- article_pageviews(
+#   article = "Barack_Obama",
+#   granularity = "daily",
+#   start = "2007020100",
+#   end = "2016120100"
+# )
+
+# obama_pageviews$date
+
+obama_pageviews <- old_pageviews(
   article = "Barack_Obama",
   granularity = "daily",
-  start = "2007020100",
-  end = "2016120100"
+  start = "2008010100",
+  end = "2008123100"
 )
 
-obama_pageviews
+obama_pageviews$date
 
 biden_pageviews <- article_pageviews(
   article = "Joe_Biden",
   granularity = "daily",
-  start = "2015100100",
-  end = "2015100200"
+  start = "2007020100",
+  end = "2016120100"
 )
 biden_pageviews
+
+
+
+democratic_2008_pageviews <- article_pageviews(
+  article = "Democratic_Party_(United_States)",
+  granularity = "daily",
+  start = "2007020100",
+  end = "2016120100"
+)
+democratic_2008_pageviews
 
 ## Republicans
 John McCain (Republican) and Sarah Palin (Running Mate)
@@ -79,18 +103,19 @@ John McCain (Republican) and Sarah Palin (Running Mate)
 McCain_pageviews <- article_pageviews(
   article = "John_Mccain",
   granularity = "daily",
-  start = "2015100100",
-  end = "2015100200"
+  start = "2007020100",
+  end = "2016120100"
 )
 McCain_pageviews
 
 Palin_pageviews <- article_pageviews(
   article = "Sarah_Palin",
   granularity = "daily",
-  start = "2015100100",
-  end = "2015100200"
+  start = "2007020100",
+  end = "2016120100"
 )
 Palin_pageviews
+
 # 2012
 
 # 2016
