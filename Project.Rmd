@@ -1,3 +1,4 @@
+install.packages(c("fpp2","dpylr","pageviews","lubridate","jsonlite","httr"))
 # Installing Packages
 ```{r}
 library(httr)
@@ -73,7 +74,23 @@ biden_pageviews <- article_pageviews(
 biden_pageviews
 
 ## Republicans
+John McCain (Republican) and Sarah Palin (Running Mate)
 
+McCain_pageviews <- article_pageviews(
+  article = "John_Mccain",
+  granularity = "daily",
+  start = "2015100100",
+  end = "2015100200"
+)
+McCain_pageviews
+
+Palin_pageviews <- article_pageviews(
+  article = "Sarah_Palin",
+  granularity = "daily",
+  start = "2015100100",
+  end = "2015100200"
+)
+Palin_pageviews
 # 2012
 
 # 2016
