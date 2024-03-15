@@ -1,4 +1,3 @@
-install.packages(c("fpp2","dpylr","pageviews","lubridate","jsonlite","httr","ggplot2"))
 # Installing Packages
 ```{r}
 library(httr)
@@ -9,7 +8,7 @@ library(dplyr)
 library(lubridate)
 ```
 # Project is about US presidential election, looking at page views and trying to predict web traffic
-```{r}
+
 2008
 Barack Obama (Democrat, Winner) and Joe Biden (Running Mate)
 John McCain (Republican) and Sarah Palin (Running Mate)
@@ -32,12 +31,12 @@ In addition to the candidate pages, consider analyzing traffic to pages related 
 Pages for each election (e.g., "2008 United States presidential election", "2012 United States presidential election", etc.).
 Key political and election issues (e.g., "Healthcare reform in the United States", "United States foreign policy", "Climate change policy of the United States", "Immigration policy of Donald Trump", etc.) during the election years.
 Political party pages (e.g., "Democratic Party (United States)", "Republican Party (United States)").
-```
+
 
 
 # Page Views from January 2008 to July 2016
 ```{r}
-old_pageviews looks at data from January 2008 to July 2016
+# old_pageviews looks at data from January 2008 to July 2016
 
 old_pageviews(
   project = "en.wikipedia",
@@ -69,6 +68,8 @@ obama_08_pageviews <- old_pageviews(
 tail(obama_08_pageviews)
 
 autoplot(obama_08_pageviews)
+
+
 
 obama_pageviews <- article_pageviews(
   article = "Barack_Obama",
