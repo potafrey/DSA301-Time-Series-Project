@@ -37,10 +37,6 @@ Political party pages (e.g., "Democratic Party (United States)", "Republican Par
 
 # Page Views from January 2008 to July 2016
 ```{r}
-enwiki_1_october_pageviews <- project_pageviews()
-enwiki_hourly <- project_pageviews(granularity = "daily", end = "2015100123")
-
-enwiki_hourly
 old_pageviews looks at data from January 2008 to July 2016
 
 old_pageviews(
@@ -54,6 +50,7 @@ old_pageviews(
 
 # Basic example
 r_pageviews <- article_pageviews()
+2015-07-01 is the earliest?
 pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
 
 # 2008
@@ -61,65 +58,78 @@ pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
 
 # Obama announced that he would run for president in Feb 2007
 
-# obama_pageviews <- article_pageviews(
-#   article = "Barack_Obama",
-#   granularity = "daily",
-#   start = "2007020100",
-#   end = "2016120100"
-# )
+obama_pageviews <- article_pageviews(
+  article = "Barack_Obama",
+  granularity = "daily",
+  start = "2015010100",
+  end = "2017010700"
+)
 
-# obama_pageviews$date
+head(obama_pageviews)
 
-obama_pageviews <- old_pageviews(
+obama_08_pageviews <- old_pageviews(
   article = "Barack_Obama",
   granularity = "daily",
   start = "2008010100",
-  end = "2008123100"
+  end = "2016080500"
 )
 
-obama_pageviews$date
+tail(obama_pageviews)
 
-biden_pageviews <- article_pageviews(
+
+biden_pageviews <- old_pageviews(
   article = "Joe_Biden",
   granularity = "daily",
-  start = "2007020100",
-  end = "2016120100"
+  start = "2008010100",
+  end = "2016080500"
 )
 biden_pageviews
 
 
 
-democratic_2008_pageviews <- article_pageviews(
+democratic_2008_pageviews <- old_pageviews(
   article = "Democratic_Party_(United_States)",
   granularity = "daily",
-  start = "2007020100",
-  end = "2016120100"
+  start = "2008010100",
+  end = "2016080500"
 )
 democratic_2008_pageviews
 
 ## Republicans
 John McCain (Republican) and Sarah Palin (Running Mate)
 
-McCain_pageviews <- article_pageviews(
+McCain_pageviews <- old_pageviews(
   article = "John_Mccain",
   granularity = "daily",
-  start = "2007020100",
-  end = "2016120100"
+  start = "2008010100",
+  end = "2016080500"
 )
 McCain_pageviews
 
-Palin_pageviews <- article_pageviews(
+Palin_pageviews <- old_pageviews(
   article = "Sarah_Palin",
   granularity = "daily",
-  start = "2007020100",
-  end = "2016120100"
+  start = "2008010100",
+  end = "2016080500"
 )
 Palin_pageviews
 
+Republican_Party_(United_States)
+republican_2008_pageviews <- old_pageviews(
+  article = "Republican_Party_(United_States)",
+  granularity = "daily",
+  start = "2008010100",
+  end = "2016080500"
+)
+republican_2008_pageviews
+
+```
+
+# Other years
+```{r}
 # 2012
 
 # 2016
 
 # 2020
 ```
-
