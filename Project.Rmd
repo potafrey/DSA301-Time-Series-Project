@@ -61,9 +61,19 @@ obama_pageviews <- article_pageviews(
 )
 
 
+
 obama_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
-autoplot(obama_ts)
-autoplot(decompose(x = obama_ts, type = "multiplicative"))
+obama_ts_DA <- obama_ts/monthdays(obama_ts)
+autoplot(obama_ts_DA) +
+  xlab("Years") + ylab("Views") +
+  ggtitle("Average views per day")
+
+ggAcf(obama_ts_DA)
+
+# There are significant lags in r1,2,3 and in r19 to 24
+lambda <- BoxCox.lambda(obama_ts_DA)
+autoplot(BoxCox(obama_ts_DA, lambda))
+autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 
 
 biden_pageviews <- article_pageviews(
