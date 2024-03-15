@@ -61,23 +61,10 @@ obama_pageviews <- article_pageviews(
 )
 
 
-obama_08_part2_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
-autoplot(obama_08_part2_ts)
-autoplot(decompose(x = obama_08_part2_ts, type = "multiplicative"))
+obama_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
+autoplot(obama_ts)
+autoplot(decompose(x = obama_ts, type = "multiplicative"))
 
-obama_combined_pageviews <- bind_rows(obama_08_pageviews,obama_pageviews)
-
-
-biden_08_pageviews <- old_pageviews(
-  article = "Joe_Biden",
-  granularity = "monthly",
-  start = "2008010100",
-  end = "2016083100"
-)
-
-biden_08_ts <-ts(data = biden_08_pageviews$views, start = c(2008,1), frequency = 12)
-autoplot(biden_08_ts)
-autoplot(decompose(x = biden_08_ts))
 
 biden_pageviews <- article_pageviews(
   article = "Joe_Biden",
