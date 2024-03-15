@@ -38,14 +38,9 @@ Political party pages (e.g., "Democratic Party (United States)", "Republican Par
 # Page Views from January 2008 to July 2016
 ```{r}
 # old_pageviews looks at data from January 2008 to July 2016
+#Description
+# This retrieves per-project pageview counts from January 2008 to July 2016. These counts are calculated using the 'legacy' (read: old) model, which overcounts due to its inclusion of web-crawlers and similar automata.
 
-old_pageviews(
-  project = "en.wikipedia",
-  platform = "all",
-  granularity = "daily",
-  start = "2015100100",
-  end = "2015101200"
-)
 
 pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
 # Basic example
@@ -58,30 +53,20 @@ r_pageviews <- article_pageviews()
 
 # Obama announced that he would run for president in Feb 2007
 
-
-obama_08_pageviews <- old_pageviews(
-  article = "Barack_Obama",
-  granularity = "monthly",
-  start = "2008010100",
-  end = "2016083100"
-  )
-
-tail(obama_08_pageviews)
-
-obama_08_ts <-ts(data = obama_08_pageviews$views, start = c(2008,1), frequency = 12)
-autoplot(obama_08_ts)
-
 obama_pageviews <- article_pageviews(
   article = "Barack_Obama",
   granularity = "monthly",
-  start = "2016093000",
+  start = "2015013000",
   end = "2023123100"
 )
 
+
 obama_08_part2_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
 autoplot(obama_08_part2_ts)
+autoplot(decompose(x = obama_08_part2_ts, type = "multiplicative"))
 
-head(obama_pageviews)
+obama_combined_pageviews <- bind_rows(obama_08_pageviews,obama_pageviews)
+
 
 biden_08_pageviews <- old_pageviews(
   article = "Joe_Biden",
@@ -92,6 +77,7 @@ biden_08_pageviews <- old_pageviews(
 
 biden_08_ts <-ts(data = biden_08_pageviews$views, start = c(2008,1), frequency = 12)
 autoplot(biden_08_ts)
+autoplot(decompose(x = biden_08_ts))
 
 biden_pageviews <- article_pageviews(
   article = "Joe_Biden",
@@ -104,7 +90,7 @@ biden_08_part2_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequenc
 autoplot(biden_08_part2_ts)
 
 
-democratic_2008_pageviews <- old_pageviews(
+democratic_2008_pageviews <- article_pageviews(
   article = "Democratic_Party_(United_States)",
   granularity = "daily",
   start = "2008010100",
