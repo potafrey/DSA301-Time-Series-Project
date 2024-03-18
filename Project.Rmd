@@ -104,9 +104,6 @@ ggAcf(obama_ts_DA)
 ## VAR
 
 # lol test 2
-
-# lol test 2
-#test test
 ```
 
 ```{r}
