@@ -35,7 +35,7 @@ Political party pages (e.g., "Democratic Party (United States)", "Republican Par
 
 
 
-# Page Views from January 2008 to July 2016
+# Page Views from January 2008 to July 2016 -- Democratic
 ```{r}
 # old_pageviews looks at data from January 2008 to July 2016
 #Description
@@ -75,6 +75,8 @@ lambda <- BoxCox.lambda(obama_ts_DA)
 autoplot(BoxCox(obama_ts_DA, lambda))
 autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 
+autoplot(stl(obama_ts_DA, s.window="periodic"))
+
 
 biden_pageviews <- article_pageviews(
   article = "Joe_Biden",
@@ -95,6 +97,11 @@ democratic_2008_pageviews <- article_pageviews(
 )
 democratic_2008_pageviews
 
+
+
+```
+# Page Views from January 2008 to July 2016 -- Republican
+```{r}
 ## Republicans
 John McCain (Republican) and Sarah Palin (Running Mate)
 
