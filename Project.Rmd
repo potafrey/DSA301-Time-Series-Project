@@ -37,7 +37,6 @@ Key political and election issues (e.g., "Healthcare reform in the United States
 Political party pages (e.g., "Democratic Party (United States)", "Republican Party (United States)").
 
 
-# Page Views from January 2008 to July 2016 -- Democratic
 ```{r}
 # old_pageviews looks at data from January 2008 to July 2016
 #Description
@@ -49,7 +48,11 @@ pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
 r_pageviews <- article_pageviews()
 # 2015-07-01 is the earliest it can access
 
-
+```
+Steps
+1. 
+# Page Views from January 2008 to July 2016 -- Democratic
+```{r}
 # 2020
 ## Democrats
 
