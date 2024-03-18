@@ -103,6 +103,7 @@ ggAcf(obama_ts_DA)
 
 ## VAR
 
+#test test
 ```
 
 ```{r}
