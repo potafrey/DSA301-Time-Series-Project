@@ -7,6 +7,7 @@ library(fpp2)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
+library(forecast)
 ```
 # Project is about US presidential election, looking at page views and trying to predict web traffic
 
@@ -80,10 +81,15 @@ autoplot(stl(obama_ts_DA, s.window="periodic"))
 
 # There are significant lags in r1,2,3 and in r19 to 24
 lambda <- BoxCox.lambda(obama_ts_DA)
-autoplot(BoxCox(obama_ts_DA, lambda))
+obama_bc <- BoxCox(obama_ts_DA, lambda)
+autoplot(obama_bc)
 
 
 ggAcf(obama_ts_DA)
+
+#train-test split
+obama_train <- window(obama_ts_DA, )
+
 
 # Build the 4 benchmark models
 
@@ -97,6 +103,13 @@ ggAcf(obama_ts_DA)
 
 # Build complex model
 ## ARIMA
+nsdiffs(obama_ts_DA) #returns 0
+ndiffs(obama_ts_DA) #returns 1
+
+#----------
+#auto arima
+obama_auto_arima <- auto.arima(obama_ts_DA, lambda = lambda)
+obama_auto_arima #auto arima returned ARIMA(0,1,1)(0,0,1)
 
 ## S-ARIMA
 
@@ -105,9 +118,26 @@ ggAcf(obama_ts_DA)
 ## VECM
 
 ## VAR
-
-# lol test 2
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 biden_pageviews <- article_pageviews(
