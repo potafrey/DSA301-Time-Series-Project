@@ -18,9 +18,12 @@ John McCain (Republican) and Sarah Palin (Running Mate)
 Barack Obama (Democrat, Winner) and Joe Biden (Running Mate)
 Mitt Romney (Republican) and Paul Ryan (Running Mate)
 
+
 2016
 Donald Trump (Republican, Winner) and Mike Pence (Running Mate)
 Hillary Clinton (Democrat) and Tim Kaine (Running Mate)
+
+-- Due to lack of credible historic data we will not use oldpage views and hence not forecast 2008, 2012, 2016 -- 
 
 2020
 Joe Biden (Democrat, Winner) and Kamala Harris (Running Mate)
@@ -32,7 +35,6 @@ In addition to the candidate pages, consider analyzing traffic to pages related 
 Pages for each election (e.g., "2008 United States presidential election", "2012 United States presidential election", etc.).
 Key political and election issues (e.g., "Healthcare reform in the United States", "United States foreign policy", "Climate change policy of the United States", "Immigration policy of Donald Trump", etc.) during the election years.
 Political party pages (e.g., "Democratic Party (United States)", "Republican Party (United States)").
-
 
 
 # Page Views from January 2008 to July 2016 -- Democratic
@@ -48,7 +50,7 @@ r_pageviews <- article_pageviews()
 # 2015-07-01 is the earliest it can access
 
 
-# 2008
+# 2020
 ## Democrats
 
 # Obama announced that he would run for president in Feb 2007
@@ -60,24 +62,50 @@ obama_pageviews <- article_pageviews(
   end = "2023123100"
 )
 
+head(obama_pageviews)
 
-
-obama_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
+obama_ts <-ts(data = obama_pageviews$views, start = c(2015,7), frequency = 12)
 obama_ts_DA <- obama_ts/monthdays(obama_ts)
 autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
   ggtitle("Average views per day")
 
-ggAcf(obama_ts_DA)
-
-# There are significant lags in r1,2,3 and in r19 to 24
-lambda <- BoxCox.lambda(obama_ts_DA)
-autoplot(BoxCox(obama_ts_DA, lambda))
+# Decompose
 autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 
 autoplot(stl(obama_ts_DA, s.window="periodic"))
 
+# There are significant lags in r1,2,3 and in r19 to 24
+lambda <- BoxCox.lambda(obama_ts_DA)
+autoplot(BoxCox(obama_ts_DA, lambda))
 
+
+ggAcf(obama_ts_DA)
+
+# Build the 4 benchmark models
+
+## Naive
+
+## Snaive
+
+## Drift
+
+## Mean
+
+# Build complex model
+## ARIMA
+
+## S-ARIMA
+
+## ARIMA-X
+
+## VECM
+
+## VAR
+
+```
+
+```{r}
 biden_pageviews <- article_pageviews(
   article = "Joe_Biden",
   granularity = "monthly",
