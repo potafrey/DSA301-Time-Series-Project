@@ -80,41 +80,35 @@ ARIMA
 obama_pageviews <- article_pageviews(
   article = "Barack_Obama",
   granularity = "monthly",
-  start = "2015013000",
+  start = "2016010100",
   end = "2023123100"
 )
 
-head(obama_pageviews)
+tail(obama_pageviews)
 
-obama_ts <-ts(data = obama_pageviews$views, start = c(2015,7), frequency = 12)
+obama_ts <-ts(data = obama_pageviews$views, start = c(2016,1), frequency = 12)
 obama_ts_DA <- obama_ts/monthdays(obama_ts)
+obama_ts_DA
 autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
   ggtitle("Average views per day")
 
 # There are significant lags in r1,2,3 and in r19 to 24
 obama_lambda <- BoxCox.lambda(obama_ts_DA)
-autoplot(BoxCox(obama_ts_DA, lambda = obama_lambda))
+obama_bc <- BoxCox(obama_ts_DA, obama_lambda)
+autoplot(obama_bc)
 
-autoplot(InvBoxCox(BoxCox(obama_ts_DA, lambda = obama_lambda), lambda = obama_lambda))
+#train-test split
+obama_train <- window(obama_bc, start=c(2016, 1), end = c(2021, 12))
+obama_test <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 
+#obama_lambda <- BoxCox.lambda(obama_ts_DA)
+#autoplot(BoxCox(obama_ts_DA, lambda = obama_lambda))
 
 # Decompose
 autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 
 autoplot(stl(obama_ts_DA, s.window="periodic"))
-
-
-# There are significant lags in r1,2,3 and in r19 to 24
-lambda <- BoxCox.lambda(obama_ts_DA)
-obama_bc <- BoxCox(obama_ts_DA, lambda)
-autoplot(obama_bc)
-
-
-ggAcf(obama_ts_DA)
-
-#train-test split
-obama_train <- window(obama_ts_DA, )
 
 
 # Build the 4 benchmark models
@@ -129,22 +123,38 @@ obama_train <- window(obama_ts_DA, )
 
 # Build complex model
 ## ARIMA
-nsdiffs(obama_ts_DA) #returns 0
-ndiffs(obama_ts_DA) #returns 1
+nsdiffs(obama_train) #returns 0
+ndiffs(obama_train) #returns 0
+acf(obama_ts_DA, lag.max = 96) #slow decaying, indicating presence of AR.
+pacf(obama_train, lag.max = 96) #random spikes, indicating seasonal MA component
 
-#----------
+Arima(obama_train, order = c(1,0,0), seasonal = c(0,0,1)) 
+Arima(obama_train, order = c(1,0,1), seasonal = c(0,0,1)) 
+Arima(obama_train, order = c(1,0,1), seasonal = c(1,0,1)) 
+
+#ARIMA(1,0,1)(1,0,1) returned the lowest AICc of -1125.53
+
 #auto arima
-obama_auto_arima <- auto.arima(obama_ts_DA, lambda = lambda)
-obama_auto_arima #auto arima returned ARIMA(0,1,1)(0,0,1)
+obama_auto_arima <- auto.arima(obama_train)
+obama_auto_arima #auto arima returned ARIMA(1,0,0)(0,0,1) with AICc of -1127.92
 
+#ARIMA forecasting
+obama_arima <- Arima(obama_train, order = c(1,0,1), seasonal = c(1,0,1)) 
+obama_auto_arima_fc <- forecast(obama_auto_arima, h = 24)
+obama_arima_fc <- forecast(obama_arima, h = 24)
+obama_arima_fc
+checkresiduals(obama_arima_fc)
+checkresiduals(obama_auto_arima_fc)
 
-## S-ARIMA
+obama_auto_arima_error <-  (InvBoxCox(unlist(obama_auto_arima_fc$mean) , lambda = obama_lambda) - obama_test)
+mean(obama_auto_arima_error)
 
-## ARIMA-X
+obama_arima_error <-  (InvBoxCox(unlist(obama_arima_fc$mean) , lambda = obama_lambda) - obama_test)
+mean(obama_arima_error)
 
-## VECM
+#Auto ARIMA gave a lower absolute error
 
-## VAR
+autoplot(InvBoxCox(unlist(obama_arima_fc$mean) , lambda = obama_lambda), series = "ARIMA(1,0,1)(1,0,1)") + autolayer(obama_test) + autolayer(InvBoxCox(unlist(obama_auto_arima_fc$mean) , lambda = obama_lambda), series = "ARIMA(1,0,0)(0,0,1)")
 ```
 
 
