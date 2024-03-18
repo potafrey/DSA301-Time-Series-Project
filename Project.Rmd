@@ -51,7 +51,25 @@ r_pageviews <- article_pageviews()
 
 ```
 Steps
-1. 
+1. Get pageview data --> convert to time series --> daily average --> eyeball data --> determine type of decomposition
+2. Make data stationary -->nsdiffs, ndiffs --> makes ts variance stationary
+3. BoxCox Transformation --> keep variance constant (for ARIMA)
+4. Decomposition --> if amplitude constant over time --> additive; if increases or decreases --> multiplicative --> split into seasonal + seasonal adj
+5. Perform Ljung Box test on residuals --> (observed - fitted both seasonal and seasonal adj) --> if fail
+3. 
+4. decompose ts --> split into seasonal and seasonal_adj
+5. run Ljung_box on residuals (observed - fitted) --> if fail --> move on  to additive --> if fail move on to other models
+
+Steps (ARIMA)
+1. Get pageview data --> convert to time series --> daily average --> eyeball data
+2. Determine if box.cox transformation is needed --> make variance stationary
+3. Either AUTO ARIMA or manual
+4. AUTO ARIMA --> determine model
+ARIMA
+5. nsdiffs --> determine if ARIMA or SARIMA model (D component, D = 0 then ARIMA)
+6. ndiffs --> determine order of integration (d component)
+7. ACF and PACF --> determines AR component (p, q component find significant lags, determine if exponentially decaying or spike at significant lags or smooth decaying)
+8. Model Selection --> look at slides first
 # Page Views from January 2008 to July 2016 -- Democratic
 ```{r}
 # 2020
@@ -74,15 +92,17 @@ autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
   ggtitle("Average views per day")
 
+# There are significant lags in r1,2,3 and in r19 to 24
+obama_lambda <- BoxCox.lambda(obama_ts_DA)
+autoplot(BoxCox(obama_ts_DA, lambda = obama_lambda))
+
+autoplot(InvBoxCox(BoxCox(obama_ts_DA, lambda = obama_lambda), lambda = obama_lambda))
+
+
 # Decompose
 autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 
 autoplot(stl(obama_ts_DA, s.window="periodic"))
-
-# There are significant lags in r1,2,3 and in r19 to 24
-lambda <- BoxCox.lambda(obama_ts_DA)
-obama_bc <- BoxCox(obama_ts_DA, lambda)
-autoplot(obama_bc)
 
 
 ggAcf(obama_ts_DA)
