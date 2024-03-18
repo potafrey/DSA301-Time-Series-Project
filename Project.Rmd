@@ -105,6 +105,12 @@ autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
 autoplot(stl(obama_ts_DA, s.window="periodic"))
 
 
+# There are significant lags in r1,2,3 and in r19 to 24
+lambda <- BoxCox.lambda(obama_ts_DA)
+obama_bc <- BoxCox(obama_ts_DA, lambda)
+autoplot(obama_bc)
+
+
 ggAcf(obama_ts_DA)
 
 #train-test split
@@ -130,6 +136,7 @@ ndiffs(obama_ts_DA) #returns 1
 #auto arima
 obama_auto_arima <- auto.arima(obama_ts_DA, lambda = lambda)
 obama_auto_arima #auto arima returned ARIMA(0,1,1)(0,0,1)
+
 
 ## S-ARIMA
 
