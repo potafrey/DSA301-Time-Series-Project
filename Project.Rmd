@@ -98,6 +98,10 @@ obama_lambda <- BoxCox.lambda(obama_ts_DA)
 obama_bc <- BoxCox(obama_ts_DA, obama_lambda)
 autoplot(obama_bc)
 
+```
+
+## Preprocessing
+```{r}
 #train-test split
 obama_train <- window(obama_bc, start=c(2016, 1), end = c(2021, 12))
 obama_test <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
@@ -120,7 +124,9 @@ autoplot(stl(obama_ts_DA, s.window="periodic"))
 ## Drift
 
 ## Mean
-
+```
+## Building complex models
+```{r}
 # Build complex model
 ## ARIMA
 nsdiffs(obama_train) #returns 0
