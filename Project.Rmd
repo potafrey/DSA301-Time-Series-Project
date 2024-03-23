@@ -111,10 +111,19 @@ obama_test <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 #autoplot(BoxCox(obama_ts_DA, lambda = obama_lambda))
 
 # Decompose
-autoplot(decompose(x = obama_ts_DA, type = "multiplicative"))
+autoplot(decompose(x = obama_ts_DA, type = "multiplicative")) # amplitude appears to be decreasing over time, hence multiplicative
 
 autoplot(stl(obama_ts_DA, s.window="periodic"))
 
+obama_seasonal_component <- seasonal(decompose(x = obama_ts_DA, type = "multiplicative"))
+
+obama_seasonaladj_component <- seasadj(decompose(x = obama_ts_DA, type = "multiplicative"))
+
+multiplicativefitted <- (snaive(obama_seasonal_component))$fitted * (naive(obama_seasonaladj_component))$fitted
+
+obama_residuals <- obama_ts_DA - multiplicativefitted
+
+Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 reject the null hypothesis. statistically significant autocorrelation in your residuals at some lag within the tested range.
 
 # Build the 4 benchmark models
 
