@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Installing Packages
 ```{r}
 # library(httr)
@@ -181,67 +182,3 @@ autoplot(InvBoxCox(unlist(obama_arima_fc$mean) , lambda = obama_lambda), series 
 
 
 
-
-```{r}
-biden_pageviews <- article_pageviews(
-  article = "Joe_Biden",
-  granularity = "monthly",
-  start = "2016093000",
-  end = "2023123100"
-)
-
-biden_08_part2_ts <-ts(data = obama_pageviews$views, start = c(2016,9), frequency = 12)
-autoplot(biden_08_part2_ts)
-
-
-democratic_2008_pageviews <- article_pageviews(
-  article = "Democratic_Party_(United_States)",
-  granularity = "daily",
-  start = "2008010100",
-  end = "2016080500"
-)
-democratic_2008_pageviews
-
-
-
-```
-# Page Views from January 2008 to July 2016 -- Republican
-```{r}
-## Republicans
-John McCain (Republican) and Sarah Palin (Running Mate)
-
-McCain_pageviews <- old_pageviews(
-  article = "John_Mccain",
-  granularity = "daily",
-  start = "2008010100",
-  end = "2016080500"
-)
-McCain_pageviews
-
-Palin_pageviews <- old_pageviews(
-  article = "Sarah_Palin",
-  granularity = "daily",
-  start = "2008010100",
-  end = "2016080500"
-)
-Palin_pageviews
-
-Republican_Party_(United_States)
-republican_2008_pageviews <- old_pageviews(
-  article = "Republican_Party_(United_States)",
-  granularity = "daily",
-  start = "2008010100",
-  end = "2016080500"
-)
-republican_2008_pageviews
-
-```
-
-# Other years
-```{r}
-# 2012
-
-# 2016
-
-# 2020
-```
