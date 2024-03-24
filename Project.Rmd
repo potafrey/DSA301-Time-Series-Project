@@ -109,7 +109,10 @@ obama_test <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 
 #obama_lambda <- BoxCox.lambda(obama_ts_DA)
 #autoplot(BoxCox(obama_ts_DA, lambda = obama_lambda))
+```
 
+## Decomposing multiplicative
+```{r}
 # Decompose
 autoplot(decompose(x = obama_ts_DA, type = "multiplicative")) # amplitude appears to be decreasing over time, hence multiplicative
 
@@ -126,7 +129,9 @@ obama_residuals <- obama_ts_DA - multiplicativefitted
 autoplot(obama_08_ts) + autolayer(multiplicativefitted)
 
 Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 reject the null hypothesis. statistically significant autocorrelation in residuals at some lag.
-
+```
+## Decomposing additive
+```{r}
 
 autoplot(decompose(x = obama_ts_DA, type = "additive")) 
 obama_seasonal_component_additive <- seasonal(decompose(x = obama_ts_DA, type = "additive"))
@@ -138,21 +143,43 @@ Box.test(obama_residuals_additive, type = c("Ljung-Box")) # p-value is 0.9752 > 
 autoplot(obama_ts_DA) + autolayer(obama_residuals) + autolayer(obama_residuals_additive) # Multiplicative decomposition is indeed better
 
 accuracy(additivefitted, x = obama_ts_DA)
-accuracy(multiplicativefitted, x = obama_ts_DA) # Multiplicative has smaller MAE
+accuracy(multiplicativefitted, x = obama_ts_DA) # Multiplicative has smaller MAE, RMSE, MAPE
+
+```
 # Build the 4 benchmark models
 
-## Naive 
+```{r}
+obama_train_mean <- meanf(obama_train, h = 24)
+obama_train_naive <- naive(obama_train, h = 24)
+obama_train_snaive <- snaive(obama_train, h = 24)
+obama_train_drift <- rwf(obama_train, drift = TRUE, h = 24)
+
 autoplot(obama_train) +
-  autolayer(meanf(obama_train, h = 24), series = "Mean", PI = FALSE) +
-  autolayer(naive(obama_train, h = 24), series = "Naive", PI = FALSE) +
-  autolayer(snaive(obama_train, h = 24), series = "Seasonal Naive", PI = FALSE) +
-  autolayer(rwf(obama_train, drift = TRUE, h = 24), series = "Drift", PI = FALSE)
-
-## Snaive
-
-## Drift
+  autolayer(obama_train_mean, series = "Mean", PI = FALSE) +
+  autolayer(obama_train_naive, series = "Naive", PI = FALSE) +
+  autolayer(obama_train_snaive, series = "Seasonal Naive", PI = FALSE) +
+  autolayer(obama_train_drift, series = "Drift", PI = FALSE) +
+  xlab("Year") + ylab("Average Daily Views") + 
+  ggtitle("Forecasts for Average Daily Views on Barrack Obama") +
+  guides(colour = guide_legend(title = "Forecast"))
 
 ## Mean
+checkresiduals(meanf(obama_train, h = 24), series = "Mean", PI = FALSE) # There is significant autocorrelation, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_mean$mean), lambda = obama_lambda), obama_test)
+
+## Naive 
+checkresiduals(naive(obama_train, h = 24), series = "Naive", PI = FALSE) # There is no significant autocorrelation else for the first lag,residuals are relatively normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_naive$mean), lambda = obama_lambda), obama_test)
+
+## Snaive
+checkresiduals(snaive(obama_train, h = 24), series = "Seasonal Naive", PI = FALSE) # There is significant autocorrelation in a decaying pattern, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_snaive$mean), lambda = obama_lambda), obama_test)
+
+## Drift
+checkresiduals(rwf(obama_train, drift = TRUE, h = 24), series = "Drift", PI = FALSE) # There is significant autocorrelation for the first lag, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_drift$mean), lambda = obama_lambda), obama_test)
+
+# Naive has the lowest MAE compared to 
 ```
 ## Building complex models
 ```{r}
