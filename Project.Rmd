@@ -123,11 +123,30 @@ multiplicativefitted <- (snaive(obama_seasonal_component))$fitted * (naive(obama
 
 obama_residuals <- obama_ts_DA - multiplicativefitted
 
-Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 reject the null hypothesis. statistically significant autocorrelation in your residuals at some lag within the tested range.
+autoplot(obama_08_ts) + autolayer(multiplicativefitted)
 
+Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 reject the null hypothesis. statistically significant autocorrelation in residuals at some lag.
+
+
+autoplot(decompose(x = obama_ts_DA, type = "additive")) 
+obama_seasonal_component_additive <- seasonal(decompose(x = obama_ts_DA, type = "additive"))
+obama_seasonaladj_component_additive <- seasadj(decompose(x = obama_ts_DA, type = "additive"))
+additivefitted <- (snaive(obama_seasonal_component_additive))$fitted * (naive(obama_seasonaladj_component_additive))$fitted
+obama_residuals_additive <- obama_ts_DA - additivefitted
+Box.test(obama_residuals_additive, type = c("Ljung-Box")) # p-value is 0.9752 > 0.05 do not reject the null hypothesis. Residuals do not contain autocorrelation.
+
+autoplot(obama_ts_DA) + autolayer(obama_residuals) + autolayer(obama_residuals_additive) # Multiplicative decomposition is indeed better
+
+accuracy(additivefitted, x = obama_ts_DA)
+accuracy(multiplicativefitted, x = obama_ts_DA) # Multiplicative has smaller MAE
 # Build the 4 benchmark models
 
-## Naive
+## Naive 
+autoplot(obama_train) +
+  autolayer(meanf(obama_train, h = 24), series = "Mean", PI = FALSE) +
+  autolayer(naive(obama_train, h = 24), series = "Naive", PI = FALSE) +
+  autolayer(snaive(obama_train, h = 24), series = "Seasonal Naive", PI = FALSE) +
+  autolayer(rwf(obama_train, drift = TRUE, h = 24), series = "Drift", PI = FALSE)
 
 ## Snaive
 
