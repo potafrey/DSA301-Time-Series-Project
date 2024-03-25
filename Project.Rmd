@@ -123,8 +123,8 @@ autoplot(obama_train) +
   autolayer(obama_train_snaive, series = "Seasonal Naive", PI = FALSE) +
   autolayer(obama_train_drift, series = "Drift", PI = FALSE) +
   xlab("Year") + ylab("Average Daily Views") + 
-  ggtitle("Forecasts for Average Daily Views on Barrack Obama") #+
-  #guides(colour = guide_legend(title = "Forecast"))
+  ggtitle("Forecasts for Average Daily Views on Barrack Obama") +
+  guides(colour = guide_legend(title = "Forecast"))
 
 ## Mean
 checkresiduals(meanf(obama_train, h = 24), series = "Mean", PI = FALSE) # There is significant autocorrelation, residuals are normally distributed, mean of the residuals is close to 0
@@ -170,9 +170,11 @@ Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 rej
 autoplot(decompose(x = obama_ts_DA, type = "additive")) 
 obama_seasonal_component_additive <- seasonal(decompose(x = obama_ts_DA, type = "additive"))
 obama_seasonaladj_component_additive <- seasadj(decompose(x = obama_ts_DA, type = "additive"))
-additivefitted <- (snaive(obama_seasonal_component_additive))$fitted * (naive(obama_seasonaladj_component_additive))$fitted
+
+additivefitted <- (snaive(obama_seasonal_component_additive))$fitted + (naive(obama_seasonaladj_component_additive))$fitted
+
 obama_residuals_additive <- obama_ts_DA - additivefitted
-Box.test(obama_residuals_additive, type = c("Ljung-Box")) # p-value is 0.9752 > 0.05 do not reject the null hypothesis. Residuals do not contain autocorrelation.
+Box.test(obama_residuals_additive, type = c("Ljung-Box")) # p-value is 0.008128 < 0.05 Reject the null, there is autocorrelation in residuals at some lag.
 
 autoplot(obama_ts_DA) + autolayer(obama_residuals) + autolayer(obama_residuals_additive) # Multiplicative decomposition is indeed better
 
@@ -180,6 +182,50 @@ accuracy(additivefitted, x = obama_ts_DA)
 accuracy(multiplicativefitted, x = obama_ts_DA) # Multiplicative has smaller MAE, RMSE, MAPE
 
 ```
+
+# Decomposed Forecasing
+```{r}
+autoplot(stl(obama_train, s.window="periodic"))
+
+obama_seasonal_component <- seasonal(decompose(x = obama_train, type = "multiplicative"))
+
+# Check for stationary
+nsdiffs(obama_seasonal_component)
+ndiffs(diff(obama_seasonal_component, 1))
+
+# obama_seasonal_component <- diff(obama_seasonal_component)
+
+obama_seasonaladj_component <- seasadj(decompose(x = obama_train, type = "multiplicative"))
+
+obama_seasonal_component_snaive <- snaive(obama_seasonal_component, h = 24)
+
+obama_seasonaladj_component_mean <- (meanf(obama_seasonaladj_component, h = 24))
+obama_seasonaladj_component_naive <- (naive(obama_seasonaladj_component, h = 24))
+obama_seasonaladj_component_snaive <- (snaive(obama_seasonaladj_component, h = 24))
+obama_seasonaladj_component_drift <- (rwf(obama_seasonaladj_component, h = 24, drift = TRUE))
+
+multiplicativefitted_mean <- obama_seasonaladj_component_mean$mean * obama_seasonal_component_snaive$mean
+multiplicativefitted_naive <- obama_seasonaladj_component_naive$mean * obama_seasonal_component_snaive$mean
+multiplicativefitted_snaive <- obama_seasonaladj_component_snaive$mean * obama_seasonal_component_snaive$mean
+multiplicativefitted_drift <- obama_seasonaladj_component_drift$mean * obama_seasonal_component_snaive$mean
+
+obama_multiplicativefitted_mean_resid <- obama_test - InvBoxCox((multiplicativefitted_mean), lambda = obama_lambda)
+
+obama_multiplicativefitted_naive_resid <- obama_test - InvBoxCox((multiplicativefitted_naive), lambda = obama_lambda)
+
+obama_multiplicativefitted_snaive_resid <- obama_test - InvBoxCox((multiplicativefitted_snaive), lambda = obama_lambda)
+
+obama_multiplicativefitted_drift_resid <- obama_test - InvBoxCox((multiplicativefitted_drift), lambda = obama_lambda)
+
+autoplot(obama_test) +
+  autolayer(InvBoxCox((multiplicativefitted_mean), lambda = obama_lambda), series = "Mean") +
+  autolayer(InvBoxCox((multiplicativefitted_naive), lambda = obama_lambda), series = "Naive") +
+  autolayer(InvBoxCox((multiplicativefitted_snaive), lambda = obama_lambda), series = "Seasonal Naive") +
+  autolayer(InvBoxCox((multiplicativefitted_drift), lambda = obama_lambda), series = "Drift")
+  
+
+```
+## MSTL?
 
 ## Building complex models
 ```{r}
