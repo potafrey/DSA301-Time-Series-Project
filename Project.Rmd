@@ -226,6 +226,18 @@ autoplot(obama_test) +
 
 ```
 ## MSTL?
+```{r}
+autoplot(mstl(obama_ts_DA))
+
+obama_mstl <- mstl(obama_ts_DA)
+
+trendcycle(obama_mstl)
+remainder(obama_mstl)
+seasadj(obama_mstl)
+seasonal(obama_mstl)
+
+seasadj(obama_mstl) - (remainder(obama_mstl) + trendcycle(obama_mstl))
+```
 
 ## Building complex models
 ```{r}
