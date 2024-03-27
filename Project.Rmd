@@ -88,11 +88,12 @@ obama_ts_DA <- obama_ts/monthdays(obama_ts)
 obama_ts_DA
 autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
-  ggtitle("Average views per day")
+  ggtitle("Average views per day in a month")
 
-# There are significant lags in r1,2,3 and in r19 to 24
 obama_lambda <- BoxCox.lambda(obama_ts_DA)
 obama_bc <- BoxCox(obama_ts_DA, obama_lambda)
+ndiffs(obama_bc)
+obama_bc <- diff(obama_bc,1)
 autoplot(obama_bc)
 
 obama_pageviews_daily <- article_pageviews(
@@ -105,10 +106,10 @@ obama_pageviews_daily <- article_pageviews(
 obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,1), frequency = 365)
 
 autoplot(obama_ts_daily)
-ndiffs(obama_ts_daily)
-autoplot(diff(obama_ts_daily, 1))
 obama_lambda_daily <- BoxCox.lambda(obama_ts_daily)
 obama_bc_daily <- BoxCox(obama_ts_daily, obama_lambda_daily)
+ndiffs(obama_bc_daily)
+obama_bc_daily <- diff(obama_bc_daily,1)
 autoplot(obama_bc_daily)
 ```
 
@@ -196,7 +197,7 @@ accuracy(multiplicativefitted, x = obama_ts_DA) # Multiplicative has smaller MAE
 
 # Decomposed Forecasing
 ```{r}
-autoplot(stl(obama_train, s.window="periodic"))
+# autoplot(stl(obama_train, s.window="periodic"))
 
 obama_seasonal_component <- seasonal(decompose(x = obama_train, type = "multiplicative"))
 
