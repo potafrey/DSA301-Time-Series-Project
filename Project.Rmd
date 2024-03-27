@@ -296,7 +296,8 @@ obama_seasonal_component_daily <- diff(obama_seasonal_component_daily,1)
 
 obama_seasonaladj_component_daily <- seasadj(decompose(x = obama_train_daily, type = "multiplicative"))
 
-obama_seasonal_component_daily_snaive <- snaive(obama_seasonal_component, h = 365*2)
+obama_seasonal_component_daily_snaive <- snaive(obama_seasonal_component, h = 12)
+autoplot(obama_seasonal_component_daily_snaive)
 
 obama_seasonaladj_component_daily_mean <- (meanf(obama_seasonaladj_component_daily, h = 365*2))
 obama_seasonaladj_component_daily_naive <- (naive(obama_seasonaladj_component_daily, h = 365*2))
