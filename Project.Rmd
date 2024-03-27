@@ -1,8 +1,6 @@
 <<<<<<< Updated upstream
 # Installing Packages
 ```{r}
-# library(httr)
-# library(jsonlite)
 library(pageviews)
 library(fpp2)
 library(dplyr)
@@ -46,8 +44,6 @@ Political party pages (e.g., "Democratic Party (United States)", "Republican Par
 
 
 pageview_timestamps(timestamps = Sys.Date(), first = TRUE)
-# Basic example
-r_pageviews <- article_pageviews()
 # 2015-07-01 is the earliest it can access
 
 ```
@@ -99,6 +95,21 @@ obama_lambda <- BoxCox.lambda(obama_ts_DA)
 obama_bc <- BoxCox(obama_ts_DA, obama_lambda)
 autoplot(obama_bc)
 
+obama_pageviews_daily <- article_pageviews(
+  article = "Barack_Obama",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,1), frequency = 365)
+
+autoplot(obama_ts_daily)
+ndiffs(obama_ts_daily)
+autoplot(diff(obama_ts_daily, 1))
+obama_lambda_daily <- BoxCox.lambda(obama_ts_daily)
+obama_bc_daily <- BoxCox(obama_ts_daily, obama_lambda_daily)
+autoplot(obama_bc_daily)
 ```
 
 ## Preprocessing
