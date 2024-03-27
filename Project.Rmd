@@ -7,6 +7,7 @@ library(dplyr)
 library(lubridate)
 library(ggplot2)
 library(forecast)
+library(feasts)
 ```
 # Project is about US presidential election, looking at page views and trying to predict web traffic
 
@@ -67,13 +68,10 @@ ARIMA
 6. ndiffs --> determine order of integration (d component)
 7. ACF and PACF --> determines AR component (p, q component find significant lags, determine if exponentially decaying or spike at significant lags or smooth decaying)
 8. Model Selection --> look at slides first
-# Page Views from January 2008 to July 2016 -- Democratic
+# Page Views from January 2016 to December 2023 -- Democratic
 ```{r}
-# 2020
-## Democrats
-
-# Obama announced that he would run for president in Feb 2007
-
+# 2016 Obama Pageviews
+## Monthly Pageviews
 obama_pageviews <- article_pageviews(
   article = "Barack_Obama",
   granularity = "monthly",
@@ -83,6 +81,7 @@ obama_pageviews <- article_pageviews(
 
 tail(obama_pageviews)
 
+## Average daily views per month
 obama_ts <-ts(data = obama_pageviews$views, start = c(2016,1), frequency = 12)
 obama_ts_DA <- obama_ts/monthdays(obama_ts)
 obama_ts_DA
@@ -90,12 +89,14 @@ autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
   ggtitle("Average views per day in a month")
 
+## Transformation
 obama_lambda <- BoxCox.lambda(obama_ts_DA)
 obama_bc <- BoxCox(obama_ts_DA, obama_lambda)
 ndiffs(obama_bc)
 obama_bc <- diff(obama_bc,1)
 autoplot(obama_bc)
 
+# Daily Pageviews
 obama_pageviews_daily <- article_pageviews(
   article = "Barack_Obama",
   granularity = "daily",
@@ -103,11 +104,14 @@ obama_pageviews_daily <- article_pageviews(
   end = "2023123100"
 )
 
-obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,1), frequency = 365)
+obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,01), frequency = 365)
 
 autoplot(obama_ts_daily)
+
+## Transformation and Stationary
 obama_lambda_daily <- BoxCox.lambda(obama_ts_daily)
 obama_bc_daily <- BoxCox(obama_ts_daily, obama_lambda_daily)
+nsdiffs(obama_bc_daily)
 ndiffs(obama_bc_daily)
 obama_bc_daily <- diff(obama_bc_daily,1)
 autoplot(obama_bc_daily)
@@ -119,10 +123,15 @@ autoplot(obama_bc_daily)
 obama_train <- window(obama_bc, start=c(2016, 1), end = c(2021, 12))
 obama_test <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 
+#train-test split daily
+obama_train_daily <- window(obama_bc_daily,start = c(2016, 2), end = c(2021, 12))
+obama_test_daily <- window(obama_ts_daily, start = c(2022, 1), end = c(2023, 12))
+
 ```
 
 # Build the 4 benchmark models
 
+## Daily Average per Month
 ```{r}
 obama_train_mean <- meanf(obama_train, h = 24)
 obama_train_naive <- naive(obama_train, h = 24)
@@ -176,6 +185,7 @@ autoplot(obama_ts_DA) + autolayer(multiplicativefitted)
 
 Box.test(obama_residuals, type = c("Ljung-Box")) # p-value is 0.01328 < 0.05 reject the null hypothesis. statistically significant autocorrelation in residuals at some lag.
 ```
+
 ## Decomposing additive
 ```{r}
 
@@ -237,18 +247,99 @@ autoplot(obama_test) +
   
 
 ```
-## MSTL?
+
+# Daily View
+## Daily
 ```{r}
-autoplot(mstl(obama_ts_DA))
+obama_train_daily_mean <- meanf(obama_train_daily, h = 365*2)
+obama_train_daily_naive <- naive(obama_train_daily, h = 365*2)
+obama_train_daily_snaive <- snaive(obama_train_daily, h = 365*2)
+obama_train_daily_drift <- rwf(obama_train_daily, drift = TRUE, h = 365*2)
 
-obama_mstl <- mstl(obama_ts_DA)
+autoplot(obama_train_daily) +
+  autolayer(obama_train_daily_mean, series = "Mean", PI = FALSE) +
+  autolayer(obama_train_daily_naive, series = "Naive", PI = FALSE) +
+  autolayer(obama_train_daily_snaive, series = "Seasonal Naive", PI = FALSE) +
+  autolayer(obama_train_daily_drift, series = "Drift", PI = FALSE) +
+  xlab("Year") + ylab("Daily Views") + 
+  ggtitle("Forecasts for Daily Views on Barrack Obama") +
+  guides(colour = guide_legend(title = "Forecast"))
 
-trendcycle(obama_mstl)
-remainder(obama_mstl)
-seasadj(obama_mstl)
-seasonal(obama_mstl)
+## Mean
+checkresiduals(meanf(obama_train_daily, h = 365*2), series = "Mean", PI = FALSE) # There is significant autocorrelation, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_daily_mean$mean), lambda = obama_lambda_daily), obama_test_daily)
 
-seasadj(obama_mstl) - (remainder(obama_mstl) + trendcycle(obama_mstl))
+## Naive 
+checkresiduals(naive(obama_train_daily, h = 365*2), series = "Naive", PI = FALSE) # There is no significant autocorrelation else for the first lag,residuals are relatively normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_daily_naive$mean), lambda = obama_lambda_daily), obama_test_daily)
+
+## Snaive
+checkresiduals(snaive(obama_train_daily, h = 365*2), series = "Seasonal Naive", PI = FALSE) # There is significant autocorrelation in a decaying pattern, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_daily_snaive$mean), lambda = obama_lambda_daily), obama_test_daily)
+
+## Drift
+checkresiduals(rwf(obama_train_daily, drift = TRUE, h = 365*2), series = "Drift", PI = FALSE) # There is significant autocorrelation for the first lag, residuals are normally distributed, mean of the residuals is close to 0
+accuracy(InvBoxCox(unlist(obama_train_daily_drift$mean), lambda = obama_lambda_daily), obama_test_daily)
+
+```
+
+
+## Decomposed Forecasing
+```{r}
+# autoplot(stl(obama_train, s.window="periodic"))
+
+obama_seasonal_component_daily <- seasonal(decompose(x = obama_train_daily, type = "multiplicative"))
+
+# Check for stationary
+nsdiffs(obama_seasonal_component_daily)
+ndiffs(diff(obama_seasonal_component_daily, 1))
+
+obama_seasonal_component_daily <- diff(obama_seasonal_component_daily,1)
+
+obama_seasonaladj_component_daily <- seasadj(decompose(x = obama_train_daily, type = "multiplicative"))
+
+obama_seasonal_component_daily_snaive <- snaive(obama_seasonal_component, h = 365*2)
+
+obama_seasonaladj_component_daily_mean <- (meanf(obama_seasonaladj_component_daily, h = 365*2))
+obama_seasonaladj_component_daily_naive <- (naive(obama_seasonaladj_component_daily, h = 365*2))
+obama_seasonaladj_component_daily_snaive <- (snaive(obama_seasonaladj_component_daily, h = 365*2))
+obama_seasonaladj_component_daily_drift <- (rwf(obama_seasonaladj_component_daily, h = 365*2, drift = TRUE))
+
+multiplicativefitted_daily_mean <- obama_seasonaladj_component_daily_mean$mean * obama_seasonal_component_daily_snaive$mean
+
+multiplicativefitted_daily_naive <- obama_seasonaladj_component_daily_naive$mean * obama_seasonal_component_daily_snaive$mean
+
+multiplicativefitted_dailysnaive <- obama_seasonaladj_component_daily_snaive$mean * obama_seasonal_component_daily_snaive$mean
+
+multiplicativefitted_dailydrift <- obama_seasonaladj_component_daily_drift$mean * obama_seasonal_component_daily_snaive$mean
+
+obama_multiplicativefitted_mean_resid <- obama_test - InvBoxCox((multiplicativefitted_mean), lambda = obama_lambda)
+
+obama_multiplicativefitted_naive_resid <- obama_test - InvBoxCox((multiplicativefitted_naive), lambda = obama_lambda)
+
+obama_multiplicativefitted_snaive_resid <- obama_test - InvBoxCox((multiplicativefitted_snaive), lambda = obama_lambda)
+
+obama_multiplicativefitted_drift_resid <- obama_test - InvBoxCox((multiplicativefitted_drift), lambda = obama_lambda)
+
+autoplot(obama_test) +
+  autolayer(InvBoxCox((multiplicativefitted_mean), lambda = obama_lambda), series = "Mean") +
+  autolayer(InvBoxCox((multiplicativefitted_naive), lambda = obama_lambda), series = "Naive") +
+  autolayer(InvBoxCox((multiplicativefitted_snaive), lambda = obama_lambda), series = "Seasonal Naive") +
+  autolayer(InvBoxCox((multiplicativefitted_drift), lambda = obama_lambda), series = "Drift")
+  
+
+```
+
+# MSTL
+```{r}
+autoplot(mstl(obama_ts_daily))
+obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365))
+autoplot(obama_msts)
+obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365))))
+
+BoxCox.lambda(obama_msts) # same as daily
+
+
 ```
 
 ## Building complex models
