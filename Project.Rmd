@@ -68,6 +68,7 @@ ARIMA
 6. ndiffs --> determine order of integration (d component)
 7. ACF and PACF --> determines AR component (p, q component find significant lags, determine if exponentially decaying or spike at significant lags or smooth decaying)
 8. Model Selection --> look at slides first
+
 # Page Views from January 2016 to December 2023 -- Democratic
 ```{r}
 # 2016 Obama Pageviews
@@ -379,7 +380,29 @@ mean(obama_arima_error)
 autoplot(InvBoxCox(unlist(obama_arima_fc$mean) , lambda = obama_lambda), series = "ARIMA(1,0,1)(1,0,1)") + autolayer(obama_test) + autolayer(InvBoxCox(unlist(obama_auto_arima_fc$mean) , lambda = obama_lambda), series = "ARIMA(1,0,0)(0,0,1)")
 ```
 
+```{r}
+#ARIMA-X
+midterm_pageviews <- article_pageviews(
+  article = "United_States_midterm_election",
+  granularity = "monthly",
+  start = "2016010100",
+  end = "2023123100"
+)
 
+midterm_ts <-ts(data = midterm_pageviews$views, start = c(2016,1), frequency = 12)
+midterm_ts_DA <- midterm_ts/monthdays(midterm_ts)
+midterm_ts_DA
+#autoplot(midterm_ts_DA)
+
+midterm_train <- window(midterm_ts_DA, start=c(2016, 2), end = c(2021, 12))
+midterm_test <- window(midterm_ts_DA, start = c(2022, 1), end = c(2023, 12))
+
+obama_auto_arimax <- auto.arima(obama_train, xreg = midterm_train)
+obama_arimax_fc <- forecast(obama_auto_arimax, xreg = midterm_test)
+autoplot(InvBoxCox(unlist(obama_arimax_fc$mean), lambda = obama_lambda))
+
+
+```
 
 
 
