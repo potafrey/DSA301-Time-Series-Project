@@ -53,9 +53,36 @@ obama_test_month <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 obama_train_daily <- window(obama_ts_daily, start = c(2016, 1), end = c(2021, 12))
 obama_test_daily <- window(obama_ts_daily, start = c(2022, 1), end = c(2023, 12))
 ```
-
-## Decomposition using stlf
+## Decomposition using stlf on month
 ```{r}
-autoplot(forecast(stlf(obama_train_month, method = "naive",lambda = "auto")))
+autoplot(forecast(stlf(obama_train_month, method = "naive",lambda = "auto")), series = "Naive", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_month, method = "rwdrift",lambda = "auto")), series = "Drift", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_month, method = "arima",lambda = "auto")), series = "ARIMA", PI = FALSE) +
+  ggtitle("Average daily views per month")
+```
+## Decomposition using stlf on daily
+```{r}
+autoplot(forecast(stlf(obama_train_daily, method = "naive",lambda = "auto")), series = "Naive", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_daily, method = "rwdrift",lambda = "auto")), series = "Drift", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), series = "ARIMA", PI = FALSE) +
+  ggtitle("Average daily views")
+```
+
+# 4 bench mark models
+## Monthly
+```{r}
+
+```
+## Daily
+```{r}
+
+```
+
+# MSTL
+```{r}
+autoplot(mstl(obama_ts_daily))
+obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365))
+autoplot(obama_msts)
+obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365))))
 ```
 
