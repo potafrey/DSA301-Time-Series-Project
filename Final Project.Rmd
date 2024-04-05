@@ -84,5 +84,52 @@ autoplot(mstl(obama_ts_daily))
 obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365))
 autoplot(obama_msts)
 obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365))))
+autoplot(obama_mstl)
+
+#splitting into seasonal and seasonally adjusted
+obama_s_adj <- obama_mstl[,2] + obama_mstl[,6]
+autoplot(obama_s_adj)
+
+obama_seasonal_weekly <- obama_mstl[,3]
+obama_seasonal_monthly <- obama_mstl[,4]
+obama_seasonal_monthly <- obama_mstl[,5]
 ```
+
+
+
+#ARIMA Model
+```{r}
+nsdiffs(obama_s_adj) #returns 0
+ndiffs(obama_s_adj) #returns 1
+
+obama_arima <- auto.arima(diff(obama_s_adj))
+#ARIMA(5,0,1) was returned
+
+obama_arima_fc <- forecast(obama_arima, h = 24)
+autoplot(obama_arima_fc)
+
+checkresiduals(obama_arima_fc)
+```
+p-value for residual test returned 4.441e-16, meaning there is significant correlation between the residuals.
+
+
+#ARIMA-X Model
+```{r}
+# Daily data for House of Representatives pageviews
+dem_pageviews_daily <- article_pageviews(
+  article = "Democratic_Party_(United_States)",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,01), frequency = 365)
+
+obama_arimax <- auto.arima(diff(obama_s_adj), xreg = dem_pageviews_daily)
+
+```
+
+
+
+
 
