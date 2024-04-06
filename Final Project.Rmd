@@ -36,7 +36,7 @@ obama_pageviews_daily <- article_pageviews(
 )
 
 ## Daily timeseries
-obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,01), frequency = 365)
+obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,01), frequency = 365.25)
 autoplot(obama_ts_daily) +
   xlab("Years") + ylab("Views") +
   ggtitle("Views in a day")
@@ -81,9 +81,10 @@ autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), s
 # MSTL
 ```{r}
 autoplot(mstl(obama_ts_daily))
-obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365))
+obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365.25))
 autoplot(obama_msts)
-obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365))))
+obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365.25))))
+obama_mstl
 autoplot(obama_mstl)
 
 #splitting into seasonal and seasonally adjusted
@@ -92,23 +93,24 @@ autoplot(obama_s_adj)
 
 obama_seasonal_weekly <- obama_mstl[,3]
 obama_seasonal_monthly <- obama_mstl[,4]
-obama_seasonal_monthly <- obama_mstl[,5]
+obama_seasonal_yearly <- obama_mstl[,5]
+
+snaive(obama_seasonal_yearly, h = 730.5)
 ```
 
 
 
 #ARIMA Model
 ```{r}
-nsdiffs(obama_s_adj) #returns 0
-ndiffs(obama_s_adj) #returns 1
-
-obama_arima <- auto.arima(diff(obama_s_adj))
+obama_arima <- auto.arima(obama_s_adj)
 #ARIMA(5,0,1) was returned
 
-obama_arima_fc <- forecast(obama_arima, h = 24)
+obama_s_adj_arima_fc <- forecast(obama_arima, h = 24)
+plot(obama_s_adj_arima_fc)
+obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
 autoplot(obama_arima_fc)
 
-checkresiduals(obama_arima_fc)
+checkresiduals(obama_s_adj_arima_fc)
 ```
 p-value for residual test returned 4.441e-16, meaning there is significant correlation between the residuals.
 
@@ -123,9 +125,11 @@ dem_pageviews_daily <- article_pageviews(
   end = "2023123100"
 )
 
-dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,01), frequency = 365)
+dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1,1), frequency = 365.25)
+dem_ts_daily
 
-obama_arimax <- auto.arima(diff(obama_s_adj), xreg = dem_pageviews_daily)
+obama_arimax <- auto.arima(obama_s_adj, xreg = dem_ts_daily)
+
 
 ```
 
