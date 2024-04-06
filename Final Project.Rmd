@@ -126,11 +126,13 @@ dem_pageviews_daily <- article_pageviews(
   end = "2023123100"
 )
 
-dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1,1), frequency = 365.25)
+dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 dem_ts_daily
 
 obama_arimax <- auto.arima(obama_s_adj, xreg = dem_ts_daily)
-
+forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
+forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
+forecast_obama #not sure why this time series starts from (9,3) and ends at (11,2)
 
 ```
 
