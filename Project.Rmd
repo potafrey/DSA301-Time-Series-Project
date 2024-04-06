@@ -1,6 +1,7 @@
 <<<<<<< Updated upstream
 # Installing Packages
 ```{r}
+# install.packages("pageviews"); install.packages("fpp2"); install.packages("dplyr"); install.packages("lubridate"); install.packages("ggplot2"); install.packages("forecast"); install.packages("feasts")
 library(pageviews)
 library(fpp2)
 library(dplyr)
@@ -285,7 +286,7 @@ accuracy(InvBoxCox(unlist(obama_train_daily_drift$mean), lambda = obama_lambda_d
 ```
 
 
-## Decomposed Forecasing
+## Decomposed Forecasting
 ```{r}
 obama_seasonal_component_daily <- seasonal(decompose(x = obama_train_daily, type = "multiplicative"))
 
