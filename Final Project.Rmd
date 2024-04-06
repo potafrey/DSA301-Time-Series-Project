@@ -105,10 +105,11 @@ snaive(obama_seasonal_yearly, h = 730.5)
 obama_arima <- auto.arima(obama_s_adj)
 #ARIMA(5,0,1) was returned
 
-obama_s_adj_arima_fc <- forecast(obama_arima, h = 24)
+obama_s_adj_arima_fc <- forecast(obama_arima, h = 730.5)
 plot(obama_s_adj_arima_fc)
 obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
-autoplot(obama_arima_fc)
+obama_arima_fc <- ts(obama_arima_fc, start = c(2024, 1), frequency = 365.25)
+autoplot(obama_ts_daily) + autolayer(obama_arima_fc)
 
 checkresiduals(obama_s_adj_arima_fc)
 ```
