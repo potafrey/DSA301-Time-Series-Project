@@ -84,7 +84,6 @@ autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), s
 autoplot(mstl(obama_train_daily))
 obama_msts <- msts(obama_train_daily, seasonal.periods = c(7,12,365.25))
 autoplot(obama_msts)
-lambda_obama <- BoxCox.lambda(obama_msts)
 obama_mstl <- (mstl(msts(obama_train_daily, seasonal.periods = c(7,12,365.25))))
 
 obama_mstl
@@ -133,13 +132,13 @@ dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequenc
 obama_arimax <- auto.arima(obama_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
 forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
-forecast_obama <- ts(forecast_obama, start = c(2022, 1), frequency = 365.25)
+forecast_obama <- pmax(ts(forecast_obama, start = c(2022, 1), frequency = 365.25), 0)
 autoplot(obama_test_daily) + autolayer(forecast_obama) + autolayer(obama_arima_fc)
 forecast_obama
 MAE(forecast_obama, obama_test_daily)
 
 ```
-MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
+MAE of ARIMA-X model is 37774.59, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
 
 
 #Forecasting for different Presidential Candidates in 2024
@@ -149,6 +148,8 @@ Democrats                      |                 Republicans
 Marianne Williamson                              Donald Trump
 Jason Palmer
 Joe Biden
+
+1. Williamson
 ```{r}
 # Daily data for Williamson
 williamson_pageviews_daily <- article_pageviews(
@@ -160,6 +161,41 @@ williamson_pageviews_daily <- article_pageviews(
 
 williamson_ts_daily <- ts(data = williamson_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
+williamson_train_daily <- window(williamson_ts_daily, start = c(2016, 1), end = c(2021, 12))
+williamson_test_daily <- window(williamson_ts_daily, start = c(2022, 1))
+
+williamson_msts <- msts(williamson_train_daily, seasonal.periods = c(7,12,365.25))
+williamson_mstl <- (mstl(msts(williamson_train_daily, seasonal.periods = c(7,12,365.25))))
+
+
+#splitting into seasonal and seasonally adjusted
+williamson_s_adj <- williamson_mstl[,2] + williamson_mstl[,6]
+
+williamson_seasonal_weekly <- williamson_mstl[,3]
+williamson_seasonal_monthly <- williamson_mstl[,4]
+williamson_seasonal_yearly <- williamson_mstl[,5]
+
+williamson_arimax <- auto.arima(williamson_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
+forecast_williamson_s_adj <- forecast(williamson_arimax, xreg = dem_ts_daily, h = 730.5) 
+forecast_williamson <- forecast_williamson_s_adj$mean + snaive(williamson_seasonal_yearly, h = 730.5)$mean
+forecast_williamson <- pmax(ts(forecast_williamson, start = c(2022, 1), frequency = 365.25), 0)
+forecast_williamson
+MAE(forecast_williamson, williamson_test_daily)
+
+
+williamson_full <- (mstl(msts(williamson_ts_daily, seasonal.periods = c(7,12,365.25))))
+williamson_full_s_adj <- williamson_full[,2] + williamson_full[,6]
+williamson_seasonal_yearly_full <- williamson_full[,5]
+williamson_arimax_full <- auto.arima(williamson_full_s_adj, xreg = dem_ts_daily)
+forecast_williamson_s_adj_full <- forecast(williamson_arimax_full, xreg = dem_ts_daily, h = 365.55) 
+forecast_williamson_full <- forecast_williamson_s_adj_full$mean + snaive(williamson_seasonal_yearly_full, h = 365.25)$mean
+forecast_williamson_full <- pmax(ts(forecast_williamson_full, start = c(2024, 1), frequency = 365.25), 0)
+autoplot(forecast_williamson_full)
+```
+
+
+2. Jason Palmer
+```{r}
 # Daily data for Palmer
 palmer_pageviews_daily <- article_pageviews(
   article = "Jason_Palmer",
@@ -191,14 +227,14 @@ trump_pageviews_daily <- article_pageviews(
 trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
 # Daily data for Republican Party
-trump_pageviews_daily <- article_pageviews(
+rep_pageviews_daily <- article_pageviews(
   article = "Republican_Party_(United_States)",
   granularity = "daily",
   start = "2016010100",
   end = "2023123100"
 )
 
-trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+rep_ts_daily <- ts(data = rep_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 ```
 
 ```{r}
@@ -207,10 +243,11 @@ trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), freq
 
 
 
-
-
-
-
-
-
 ```
+
+
+
+
+
+
+
