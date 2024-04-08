@@ -84,7 +84,9 @@ autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), s
 autoplot(mstl(obama_train_daily))
 obama_msts <- msts(obama_train_daily, seasonal.periods = c(7,12,365.25))
 autoplot(obama_msts)
+lambda_obama <- BoxCox.lambda(obama_msts)
 obama_mstl <- (mstl(msts(obama_train_daily, seasonal.periods = c(7,12,365.25))))
+
 obama_mstl
 autoplot(obama_mstl)
 
@@ -105,7 +107,7 @@ snaive(obama_seasonal_yearly, h = 730.5)
 ```{r}
 obama_arima <- auto.arima(obama_s_adj)
 
-obama_s_adj_arima_fc <- forecast(obama_arima, h = 730.5)
+obama_s_adj_arima_fc <- (forecast(obama_arima, h = 730.5))
 plot(obama_s_adj_arima_fc)
 obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
 obama_arima_fc <- ts(obama_arima_fc, start = c(2022, 1), frequency = 365.25)
@@ -130,13 +132,15 @@ dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequenc
 
 obama_arimax <- auto.arima(obama_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
-forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)
+forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
 forecast_obama <- ts(forecast_obama, start = c(2022, 1), frequency = 365.25)
-autoplot(forecast_obama) + autolayer(obama_test_daily)
+autoplot(obama_test_daily) + autolayer(forecast_obama) + autolayer(obama_arima_fc)
+forecast_obama
 MAE(forecast_obama, obama_test_daily)
 
 ```
 MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
+
 
 #Forecasting for different Presidential Candidates in 2024
 List of candidates:
@@ -197,4 +201,16 @@ trump_pageviews_daily <- article_pageviews(
 trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 ```
 
+```{r}
 
+
+
+
+
+
+
+
+
+
+
+```
