@@ -138,6 +138,13 @@ MAE(forecast_obama, obama_test_daily)
 ```
 MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA
 
+#Forecasting for different Presidential Candidates in 2024
+List of candidates:
+
+Democrats                      | Republicans
+Marianne Williamson              Donald Trump
+Jason Palmer
+Joe Biden
 
 
 
