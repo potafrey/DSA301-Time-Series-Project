@@ -212,7 +212,7 @@ williamson_arimax <- auto.arima(williamson_s_adj, xreg = window(dem_ts_daily,sta
 forecast_williamson_s_adj <- forecast(williamson_arimax, xreg = dem_ts_daily, h = 730.5) 
 forecast_williamson <- forecast_williamson_s_adj$mean + snaive(williamson_seasonal_yearly, h = 730.5)$mean
 forecast_williamson <- pmax(ts(forecast_williamson, start = c(2022, 1), frequency = 365.25), 0)
-forecast_williamson
+autoplot(williamson_test_daily) + autolayer(forecast_williamson)
 MAE(forecast_williamson, williamson_test_daily)
 
 
@@ -284,7 +284,7 @@ biden_arimax_full <- auto.arima(biden_full_s_adj, xreg = dem_ts_daily)
 forecast_biden_s_adj_full <- forecast(biden_arimax_full, xreg = dem_ts_daily, h = 365.25) 
 forecast_biden_full <- forecast_biden_s_adj_full$mean + snaive(biden_seasonal_yearly_full, h = 365.25)$mean
 forecast_biden_full <- pmax(ts(forecast_biden_full, start = c(2024, 1), frequency = 365.25), 0)
-autoplot(forecast_biden_full)
+autoplot(forecast_biden_full) + autolayer(biden_ts_daily)
 
 
 ```
@@ -341,15 +341,25 @@ trump_arimax_full <- auto.arima(trump_full_s_adj, xreg = rep_ts_daily)
 forecast_trump_s_adj_full <- forecast(trump_arimax_full, xreg = rep_ts_daily, h = 365.25) 
 forecast_trump_full <- forecast_trump_s_adj_full$mean + snaive(trump_seasonal_yearly_full, h = 365.25)$mean
 forecast_trump_full <- pmax(ts(forecast_trump_full, start = c(2024, 1), frequency = 365.25), 0)
-autoplot(forecast_trump_full)
+autoplot(forecast_trump_full) + autolayer(trump_ts_daily)
 
 
 
 ```
 
+#Data for Hillary Clinton
+```{r}
+# Daily data for Republican Party
+clinton_pageviews_daily <- article_pageviews(
+  article = "Hillary Clinton",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
 
-
-
+clinton_ts_daily <- ts(data = clinton_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+autoplot(window(clinton_ts_daily, start = c(2016, 1), end = c(2017, 1))) + autolayer(window(trump_ts_daily, start = c(2016, 1), end = c(2017, 1)))
+```
 
 
 
