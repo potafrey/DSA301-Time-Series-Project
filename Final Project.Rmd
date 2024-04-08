@@ -124,6 +124,13 @@ forecast_monthly <- snaive(obama_seasonal_monthly, h = 730.5)
 forecast_yearly <- snaive(obama_seasonal_yearly, h = 730.5)
 
 obama_arima <- auto.arima(obama_s_adj)
+
+autoplot(obama_train_daily) +
+  autolayer(forecast_weekly, series = "weekly") +
+  autolayer(forecast_monthly, series = "monthly") +
+  autolayer(forecast_yearly, series = "yearly")
+obama_mstl_additive <- 
+  
 ```
 
 
