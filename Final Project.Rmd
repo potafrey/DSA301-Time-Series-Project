@@ -51,7 +51,8 @@ obama_test_month <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
 
 #train-test split daily
 obama_train_daily <- window(obama_ts_daily, start = c(2016, 1), end = c(2021, 12))
-obama_test_daily <- window(obama_ts_daily, start = c(2022, 1), end = c(2023, 12))
+obama_test_daily <- window(obama_ts_daily, start = c(2022, 1))
+
 ```
 ## Decomposition using stlf on month
 ```{r}
@@ -108,9 +109,11 @@ obama_s_adj_arima_fc <- forecast(obama_arima, h = 730.5)
 plot(obama_s_adj_arima_fc)
 obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
 obama_arima_fc <- ts(obama_arima_fc, start = c(2022, 1), frequency = 365.25)
-autoplot(obama_ts_daily) + autolayer(obama_arima_fc)
-
+#autoplot(obama_ts_daily) + 
+autoplot(obama_arima_fc) + autolayer(obama_test_daily)
+MAE(obama_arima_fc, obama_test_daily)
 ```
+MAE of ARIMA model is 55327.6
 
 
 #ARIMA-X Model
@@ -125,13 +128,15 @@ dem_pageviews_daily <- article_pageviews(
 
 dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
-obama_arimax <- auto.arima(obama_s_adj, xreg = dem_ts_daily)
+obama_arimax <- auto.arima(obama_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
-forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
-autoplot(forecast_obama)
+forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)
+forecast_obama <- ts(forecast_obama, start = c(2022, 1), frequency = 365.25)
+autoplot(forecast_obama) + autolayer(obama_test_daily)
+MAE(forecast_obama, obama_test_daily)
 
 ```
-
+MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA
 
 
 
