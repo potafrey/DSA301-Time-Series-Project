@@ -277,7 +277,7 @@ autoplot(forecast_biden_full)
 ```
 
 
-
+4. Donald Trump
 ```{r}
 # Daily data for Republican Party
 rep_pageviews_daily <- article_pageviews(
