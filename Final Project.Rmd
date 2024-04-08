@@ -80,10 +80,10 @@ autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), s
 
 # MSTL
 ```{r}
-autoplot(mstl(obama_ts_daily))
-obama_msts <- msts(obama_ts_daily, seasonal.periods = c(7,12,365.25))
+autoplot(mstl(obama_train_daily))
+obama_msts <- msts(obama_train_daily, seasonal.periods = c(7,12,365.25))
 autoplot(obama_msts)
-obama_mstl <- (mstl(msts(obama_ts_daily, seasonal.periods = c(7,12,365.25))))
+obama_mstl <- (mstl(msts(obama_train_daily, seasonal.periods = c(7,12,365.25))))
 obama_mstl
 autoplot(obama_mstl)
 
@@ -103,22 +103,19 @@ snaive(obama_seasonal_yearly, h = 730.5)
 #ARIMA Model
 ```{r}
 obama_arima <- auto.arima(obama_s_adj)
-#ARIMA(5,0,1) was returned
 
 obama_s_adj_arima_fc <- forecast(obama_arima, h = 730.5)
 plot(obama_s_adj_arima_fc)
 obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
-obama_arima_fc <- ts(obama_arima_fc, start = c(2024, 1), frequency = 365.25)
+obama_arima_fc <- ts(obama_arima_fc, start = c(2022, 1), frequency = 365.25)
 autoplot(obama_ts_daily) + autolayer(obama_arima_fc)
 
-checkresiduals(obama_s_adj_arima_fc)
 ```
-p-value for residual test returned 4.441e-16, meaning there is significant correlation between the residuals.
 
 
 #ARIMA-X Model
 ```{r}
-# Daily data for House of Representatives pageviews
+# Daily data for Democratic Party pageviews
 dem_pageviews_daily <- article_pageviews(
   article = "Democratic_Party_(United_States)",
   granularity = "daily",
@@ -127,12 +124,11 @@ dem_pageviews_daily <- article_pageviews(
 )
 
 dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
-dem_ts_daily
 
 obama_arimax <- auto.arima(obama_s_adj, xreg = dem_ts_daily)
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
 forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
-forecast_obama #not sure why this time series starts from (9,3) and ends at (11,2)
+autoplot(forecast_obama)
 
 ```
 
