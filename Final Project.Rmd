@@ -136,15 +136,65 @@ autoplot(forecast_obama) + autolayer(obama_test_daily)
 MAE(forecast_obama, obama_test_daily)
 
 ```
-MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA
+MAE of ARIMA-X model is 37994.29, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
 
 #Forecasting for different Presidential Candidates in 2024
 List of candidates:
 
-Democrats                      | Republicans
-Marianne Williamson              Donald Trump
+Democrats                      |                 Republicans
+Marianne Williamson                              Donald Trump
 Jason Palmer
 Joe Biden
+```{r}
+# Daily data for Williamson
+williamson_pageviews_daily <- article_pageviews(
+  article = "Marianne_Williamson",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
 
+williamson_ts_daily <- ts(data = williamson_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+
+# Daily data for Palmer
+palmer_pageviews_daily <- article_pageviews(
+  article = "Jason_Palmer",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+palmer_ts_daily <- ts(data = palmer_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+
+# Daily data for Joe Biden
+biden_pageviews_daily <- article_pageviews(
+  article = "Joe_Biden",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+biden_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+
+# Daily data for Donald Trump
+trump_pageviews_daily <- article_pageviews(
+  article = "Donald_Trump",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+
+# Daily data for Republican Party
+trump_pageviews_daily <- article_pageviews(
+  article = "Republican_Party_(United_States)",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+```
 
 
