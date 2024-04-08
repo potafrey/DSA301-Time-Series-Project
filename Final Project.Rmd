@@ -7,6 +7,7 @@ library(lubridate)
 library(ggplot2)
 library(forecast)
 library(feasts)
+library(tsibble)
 ```
 
 # Getting Data
@@ -97,14 +98,15 @@ obama_daily_fitted_a <-forecast(stlf(obama_train_daily, method = "arima",lambda 
 accuracy(obama_daily_fitted_n, obama_test_daily)[1,c("ME", "RMSE","MAE")]
 accuracy(obama_daily_fitted_d, obama_test_daily)[1,c("ME", "RMSE","MAE")]
 accuracy(obama_daily_fitted_a, obama_test_daily)[1,c("ME", "RMSE","MAE")]
+# Negative ME from arima model suggests that it tends to underestimate the quantity being predicted, naive has the smallest RMSE
 ```
 
 # MSTL
 ```{r}
 autoplot(mstl(obama_train_daily))
-obama_msts <- msts(obama_train_daily, seasonal.periods = c(7,12,365.25))
+obama_msts <- msts(obama_train_daily, seasonal.periods = c(7,12,365.25), start = c(2016,01))
 autoplot(obama_msts)
-obama_mstl <- (mstl(msts(obama_train_daily, seasonal.periods = c(7,12,365.25))))
+obama_mstl <- mstl(obama_msts)
 
 obama_mstl
 autoplot(obama_mstl)
@@ -117,7 +119,11 @@ obama_seasonal_weekly <- obama_mstl[,3]
 obama_seasonal_monthly <- obama_mstl[,4]
 obama_seasonal_yearly <- obama_mstl[,5]
 
-snaive(obama_seasonal_yearly, h = 730.5)
+forecast_weekly <- snaive(obama_seasonal_weekly, h = 730.5)
+forecast_monthly <- snaive(obama_seasonal_monthly, h = 730.5)
+forecast_yearly <- snaive(obama_seasonal_yearly, h = 730.5)
+
+obama_arima <- auto.arima(obama_s_adj)
 ```
 
 
