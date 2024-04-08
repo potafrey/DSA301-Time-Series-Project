@@ -187,25 +187,65 @@ williamson_full <- (mstl(msts(williamson_ts_daily, seasonal.periods = c(7,12,365
 williamson_full_s_adj <- williamson_full[,2] + williamson_full[,6]
 williamson_seasonal_yearly_full <- williamson_full[,5]
 williamson_arimax_full <- auto.arima(williamson_full_s_adj, xreg = dem_ts_daily)
-forecast_williamson_s_adj_full <- forecast(williamson_arimax_full, xreg = dem_ts_daily, h = 365.55) 
+forecast_williamson_s_adj_full <- forecast(williamson_arimax_full, xreg = dem_ts_daily, h = 365.25) 
 forecast_williamson_full <- forecast_williamson_s_adj_full$mean + snaive(williamson_seasonal_yearly_full, h = 365.25)$mean
 forecast_williamson_full <- pmax(ts(forecast_williamson_full, start = c(2024, 1), frequency = 365.25), 0)
 autoplot(forecast_williamson_full)
 ```
 
 
-2. Jason Palmer
+2. Jason Palmer <--- might not work due to the wikipedia being relatively new
+
 ```{r}
 # Daily data for Palmer
 palmer_pageviews_daily <- article_pageviews(
-  article = "Jason_Palmer",
+  article = "Jason_Palmer_(politician)",
   granularity = "daily",
   start = "2016010100",
   end = "2023123100"
 )
 
 palmer_ts_daily <- ts(data = palmer_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+autoplot(palmer_ts_daily)
+palmer_train_daily <- window(palmer_ts_daily, start = c(2016, 1), end = c(2021, 12))
+palmer_test_daily <- window(palmer_ts_daily, start = c(2022, 1))
+autoplot(palmer_test_daily)
 
+palmer_mspalmer_msts <- msts(palmer_train_daily, seasonal.periods = c(7,12,365.25))
+palmer_mstl <- (mstl(msts(palmer_train_daily, seasonal.periods = c(7,12,365.25))))
+
+
+#splitting into seasonal and seasonally adjusted
+palmer_s_adj <- palmer_mstl[,2] + palmer_mstl[,6]
+
+palmer_seasonal_weekly <- palmer_mstl[,3]
+palmer_seasonal_monthly <- palmer_mstl[,4]
+palmer_seasonal_yearly <- palmer_mstl[,5]
+
+palmer_arimax <- auto.arima(palmer_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
+forecast_palmer_s_adj <- forecast(palmer_arimax, xreg = dem_ts_daily, h = 730.5) 
+forecast_palmer <- forecast_palmer_s_adj$mean + snaive(palmer_seasonal_yearly, h = 730.5)$mean
+forecast_palmer <- pmax(ts(forecast_palmer, start = c(2022, 1), frequency = 365.25), 0)
+forecast_palmer
+MAE(forecast_palmer, palmer_test_daily)
+
+
+palmer_full <- (mstl(msts(palmer_ts_daily, seasonal.periods = c(7,12,365.25))))
+palmer_full_s_adj <- palmer_full[,2] + palmer_full[,6]
+palmer_full_s_adj
+palmer_seasonal_yearly_full <- palmer_full[,5]
+dem_ts_daily
+palmer_arimax_full <- auto.arima(palmer_full_s_adj, xreg = dem_ts_daily)
+
+forecast_palmer_s_adj_full <- forecast(palmer_arimax_full, xreg = dem_ts_daily, h = 365.25) 
+forecast_palmer_full <- forecast_palmer_s_adj_full$mean + snaive(palmer_seasonal_yearly_full, h = 365.25)$mean
+forecast_palmer_full <- pmax(ts(forecast_palmer_full, start = c(2024, 1), frequency = 365.25), 0)
+autoplot(forecast_palmer_full)
+
+
+```
+
+```{r}
 # Daily data for Joe Biden
 biden_pageviews_daily <- article_pageviews(
   article = "Joe_Biden",
@@ -215,6 +255,53 @@ biden_pageviews_daily <- article_pageviews(
 )
 
 biden_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
+
+biden_train_daily <- window(biden_ts_daily, start = c(2016, 1), end = c(2021, 12))
+biden_test_daily <- window(biden_ts_daily, start = c(2022, 1))
+
+biden_msts <- msts(biden_train_daily, seasonal.periods = c(7,12,365.25))
+biden_mstl <- (mstl(msts(biden_train_daily, seasonal.periods = c(7,12,365.25))))
+
+
+#splitting into seasonal and seasonally adjusted
+biden_s_adj <- biden_mstl[,2] + biden_mstl[,6]
+
+biden_seasonal_weekly <- biden_mstl[,3]
+biden_seasonal_monthly <- biden_mstl[,4]
+biden_seasonal_yearly <- biden_mstl[,5]
+
+biden_arimax <- auto.arima(biden_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
+forecast_biden_s_adj <- forecast(biden_arimax, xreg = dem_ts_daily, h = 730.5) 
+forecast_biden <- forecast_biden_s_adj$mean + snaive(biden_seasonal_yearly, h = 730.5)$mean
+forecast_biden <- pmax(ts(forecast_biden, start = c(2022, 1), frequency = 365.25), 0)
+forecast_biden
+MAE(forecast_biden, biden_test_daily)
+
+
+biden_full <- (mstl(msts(biden_ts_daily, seasonal.periods = c(7,12,365.25))))
+biden_full_s_adj <- biden_full[,2] + biden_full[,6]
+biden_seasonal_yearly_full <- biden_full[,5]
+biden_arimax_full <- auto.arima(biden_full_s_adj, xreg = dem_ts_daily)
+forecast_biden_s_adj_full <- forecast(biden_arimax_full, xreg = dem_ts_daily, h = 365.25) 
+forecast_biden_full <- forecast_biden_s_adj_full$mean + snaive(biden_seasonal_yearly_full, h = 365.25)$mean
+forecast_biden_full <- pmax(ts(forecast_biden_full, start = c(2024, 1), frequency = 365.25), 0)
+autoplot(forecast_biden_full)
+
+
+```
+
+
+
+```{r}
+# Daily data for Republican Party
+rep_pageviews_daily <- article_pageviews(
+  article = "Republican_Party_(United_States)",
+  granularity = "daily",
+  start = "2016010100",
+  end = "2023123100"
+)
+
+rep_ts_daily <- ts(data = rep_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
 # Daily data for Donald Trump
 trump_pageviews_daily <- article_pageviews(
@@ -226,24 +313,20 @@ trump_pageviews_daily <- article_pageviews(
 
 trump_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
-# Daily data for Republican Party
-rep_pageviews_daily <- article_pageviews(
-  article = "Republican_Party_(United_States)",
-  granularity = "daily",
-  start = "2016010100",
-  end = "2023123100"
-)
-
-rep_ts_daily <- ts(data = rep_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
-```
-
-```{r}
-
-
-
-
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
