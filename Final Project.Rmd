@@ -40,6 +40,8 @@ obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,01), freq
 autoplot(obama_ts_daily) +
   xlab("Years") + ylab("Views") +
   ggtitle("Views in a day")
+
+obama_pageviews_daily$date[which.max(obama_pageviews_daily$views)]
 ```
 
 # Preprocessing
@@ -47,7 +49,7 @@ autoplot(obama_ts_daily) +
 ```{r}
 #train-test split
 obama_train_month <- window(obama_ts_DA, start=c(2016, 1), end = c(2021, 12))
-obama_test_month <- window(obama_ts_DA, start = c(2022, 1), end = c(2023, 12))
+obama_test_month <- window(obama_ts_DA, start = c(2022, 1))
 
 #train-test split daily
 obama_train_daily <- window(obama_ts_daily, start = c(2016, 1), end = c(2021, 12))
@@ -56,27 +58,45 @@ obama_test_daily <- window(obama_ts_daily, start = c(2022, 1))
 ```
 ## Decomposition using stlf on month
 ```{r}
-autoplot(forecast(stlf(obama_train_month, method = "naive",lambda = "auto")), series = "Naive", PI = FALSE) +
-autolayer(forecast(stlf(obama_train_month, method = "rwdrift",lambda = "auto")), series = "Drift", PI = FALSE) +
-autolayer(forecast(stlf(obama_train_month, method = "arima",lambda = "auto")), series = "ARIMA", PI = FALSE) +
+autoplot(obama_train_month) +
+autolayer(forecast(stlf(obama_train_month, method = "naive",lambda = "auto"), h =24), series = "Naive", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_month, method = "rwdrift",lambda = "auto"), h =24), series = "Drift", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_month, method = "arima",lambda = "auto"), h =24), series = "ARIMA", PI = FALSE) +
   ggtitle("Average daily views per month")
 ```
 ## Decomposition using stlf on daily
 ```{r}
-autoplot(forecast(stlf(obama_train_daily, method = "naive",lambda = "auto")), series = "Naive", PI = FALSE) +
-autolayer(forecast(stlf(obama_train_daily, method = "rwdrift",lambda = "auto")), series = "Drift", PI = FALSE) +
-autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto")), series = "ARIMA", PI = FALSE) +
+autoplot(obama_train_daily) +
+autolayer(forecast(stlf(obama_train_daily, method = "naive",lambda = "auto"), h = 730), series = "Naive", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_daily, method = "rwdrift",lambda = "auto"), h = 730), series = "Drift", PI = FALSE) +
+autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto"), h = 730), series = "ARIMA", PI = FALSE) +
   ggtitle("Average daily views")
 ```
 
 # 4 bench mark models
 ## Monthly
 ```{r}
+obama_month_fitted_n <- forecast(stlf(obama_train_month, method = "naive",lambda = "auto"), h =24)$mean
+obama_month_fitted_d <- forecast(stlf(obama_train_month, method = "rwdrift",lambda = "auto"), h =24)$mean
+obama_month_fitted_a <-forecast(stlf(obama_train_month, method = "arima",lambda = "auto"), h =24)$mean
+
+# Accuracy computation
+accuracy(obama_month_fitted_n, obama_test_month)[1,c("ME", "RMSE","MAE")]
+accuracy(obama_month_fitted_d, obama_test_month)[1,c("ME", "RMSE","MAE")]
+accuracy(obama_month_fitted_a, obama_test_month)[1,c("ME", "RMSE","MAE")]
+# Negative ME from arima model suggests that it tends to underestimate the quantity being predicted but has the smallest RMSE.
 
 ```
 ## Daily
 ```{r}
+obama_daily_fitted_n <- forecast(stlf(obama_train_daily, method = "naive",lambda = "auto"), h = 730)$mean
+obama_daily_fitted_d <- forecast(stlf(obama_train_daily, method = "rwdrift",lambda = "auto"), h = 730)$mean
+obama_daily_fitted_a <-forecast(stlf(obama_train_daily, method = "arima",lambda = "auto"), h = 730)$mean
 
+# Accuracy computation
+accuracy(obama_daily_fitted_n, obama_test_daily)[1,c("ME", "RMSE","MAE")]
+accuracy(obama_daily_fitted_d, obama_test_daily)[1,c("ME", "RMSE","MAE")]
+accuracy(obama_daily_fitted_a, obama_test_daily)[1,c("ME", "RMSE","MAE")]
 ```
 
 # MSTL
