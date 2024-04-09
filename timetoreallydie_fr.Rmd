@@ -239,7 +239,7 @@ williamson_pageviews_daily <- article_pageviews(
   end = "2023123100"
 )
 
-williamson_ts_daily <-ts(data = williamson_pageviews_daily$views, start = c(2016,1), frequency = 12)
+williamson_ts_daily <- ts(data = williamson_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 williamson_train_daily <- window(williamson_ts_daily, start = c(2016, 1), end = c(2021, 12))
 williamson_test_daily <- window(williamson_ts_daily, start = c(2022, 1))
 
@@ -262,8 +262,6 @@ autoplot(williamson_ts_DA) +
 # Monthly
 williamson_train_month <- window(williamson_ts_DA, start = c(2016, 1), end = c(2021, 12))
 williamson_test_month <- window(williamson_ts_DA, start = c(2022, 1))
-
-williamson_ts_daily <- ts(data = williamson_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 ```
 
 
