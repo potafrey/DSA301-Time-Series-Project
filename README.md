@@ -583,10 +583,8 @@ _(Table 4 - Model MAPE Values of Trump, rounded to 3 d.p.)_
    </td>
    <td>
 
-<p id="gdcalert16" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image16.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert17">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
 
-
-<img src="images/image16.png" width="" alt="alt_text" title="image_tooltip">
+<img src="https://github.com/potafrey/DSA301-Time-Series-Project/blob/main/Submissions/img/Figure%2014_Findings.png" width="" alt="alt_text" title="Williamson">
 
    </td>
   </tr>
@@ -595,10 +593,8 @@ _(Table 4 - Model MAPE Values of Trump, rounded to 3 d.p.)_
    </td>
    <td>
 
-<p id="gdcalert17" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image17.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert18">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
 
-
-<img src="images/image17.png" width="" alt="alt_text" title="image_tooltip">
+<img src="https://github.com/potafrey/DSA301-Time-Series-Project/blob/main/Submissions/img/Figure%2015_Findings.png" width="" alt="alt_text" title="Biden">
 
    </td>
   </tr>
@@ -607,10 +603,8 @@ _(Table 4 - Model MAPE Values of Trump, rounded to 3 d.p.)_
    </td>
    <td>
 
-<p id="gdcalert18" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image18.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert19">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
 
-
-<img src="images/image18.png" width="" alt="alt_text" title="image_tooltip">
+<img src="https://github.com/potafrey/DSA301-Time-Series-Project/blob/main/Submissions/img/Figure%2016_Findings.png" width="" alt="alt_text" title="Trump">
 
    </td>
   </tr>
