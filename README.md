@@ -157,7 +157,7 @@ Our findings have shown that generally benchmark models had the smallest MAPE, h
 Refer to Section D of References for detailed MAPE values of each model and each candidate in Table 2-4. Forecasted Graphs with ARIMA-X for each Candidate can be found in Table 5 of Section D in the References.
 
 
-# **5. Conclusion **
+# 5. Conclusion 
 
 In conclusion, the findings of this report revealed that ARIMA-X models exhibited good performances for the Obama dataset, which was applicable to the other politicians and their datasets as well. While the test errors provide a good indication of how the models perform with in-sample data, the errors should only be used as a guideline and ultimately require some contextual application. In the case of forecasting pageviews, despite benchmark models performing well, we chose not to use them as they fail at capturing the spikes occurring around the election season. We believe ARIMA-X is a better model despite a higher MAPE as each election there are different candidates. We decided to go with the candidates’ respective parties as the exogenous variables as the U.S. generally exhibits partisan views on presidential candidates, thus we believe that the party serves as a good influence for the respective pageviews.
 
