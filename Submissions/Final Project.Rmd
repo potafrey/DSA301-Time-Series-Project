@@ -1,3 +1,10 @@
+---
+title: "DSA301-G1 Final Project"
+author: "Group 1"
+date: "2024-04-10"
+output: pdf_document
+---
+
 # Installing Packages
 ```{r}
 library(pageviews)
@@ -26,7 +33,7 @@ obama_ts_DA <- obama_ts/monthdays(obama_ts)
 obama_ts_DA
 autoplot(obama_ts_DA) +
   xlab("Years") + ylab("Views") +
-  ggtitle("Average views per day in a month")
+  ggtitle("Obama Average Daily Views per Month")
 
 # Daily data
 obama_pageviews_daily <- article_pageviews(
@@ -40,7 +47,7 @@ obama_pageviews_daily <- article_pageviews(
 obama_ts_daily <-ts(data = obama_pageviews_daily$views, start = c(2016,01), frequency = 365.25)
 autoplot(obama_ts_daily) +
   xlab("Years") + ylab("Views") +
-  ggtitle("Views in a day")
+  ggtitle("Obama Daily Views")
 
 obama_pageviews_daily$date[which.max(obama_pageviews_daily$views)]
 ```
@@ -64,7 +71,7 @@ autoplot(obama_train_month) +
 autolayer(forecast(stlf(obama_train_month, method = "naive",lambda = "auto"), h =24), series = "Naive", PI = FALSE) +
 autolayer(forecast(stlf(obama_train_month, method = "rwdrift",lambda = "auto"), h =24), series = "Drift", PI = FALSE) +
 autolayer(forecast(stlf(obama_train_month, method = "arima",lambda = "auto"), h =24), series = "ARIMA", PI = FALSE) +
-  ggtitle("Average daily views per month")
+  ggtitle("STL Decomposition with Forecasts for Average Daily Views per Month")
 ```
 ## Decomposition using stlf on daily
 ```{r}
@@ -72,7 +79,7 @@ autoplot(obama_train_daily) +
 autolayer(forecast(stlf(obama_train_daily, method = "naive",lambda = "auto"), h = 730), series = "Naive", PI = FALSE) +
 autolayer(forecast(stlf(obama_train_daily, method = "rwdrift",lambda = "auto"), h = 730), series = "Drift", PI = FALSE) +
 autolayer(forecast(stlf(obama_train_daily, method = "arima",lambda = "auto"), h = 730), series = "ARIMA", PI = FALSE) +
-  ggtitle("Average daily views")
+  ggtitle("STL Decomposition with Forecasts for Daily Views")
 ```
 
 # 4 bench mark models
@@ -99,7 +106,7 @@ obama_daily_fitted_a <-forecast(stlf(obama_train_daily, method = "arima",lambda 
 accuracy(obama_daily_fitted_n, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_daily_fitted_d, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_daily_fitted_a, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
-# Negative ME from ARIMA model suggests that it tends to underestimate the quantity being predicted, RWF has the smallest MAPE of 24.658
+# Positive ME from ARIMA model suggests that it tends to overestimate the quantity being predicted, RWF has the smallest MAPE of 24.658
 ```
 
 # Splines
@@ -185,7 +192,7 @@ obama_arima_fc <- ts(obama_arima_fc, start = c(2022, 1), frequency = 365.25)
 autoplot(obama_arima_fc) + autolayer(obama_test_daily)
 accuracy(obama_arima_fc, obama_test_daily)
 ```
-MAPE of ARIMA model is 157.8397
+MAPE of ARIMA model is 64.59397
 
 
 #ARIMA-X Model
@@ -342,7 +349,7 @@ forecast_williamson_s_adj_full <- forecast(williamson_arimax_full, xreg = dem_ts
 forecast_williamson_full <- forecast_williamson_s_adj_full$mean + snaive(williamson_seasonal_yearly_full, h = 365.25)$mean
 forecast_williamson_full <- pmax(ts(forecast_williamson_full, start = c(2024, 1), frequency = 365.25), 0)
 autoplot(williamson_ts_daily) + autolayer(forecast_williamson_full)
-#MAPE of Williamson's ARIMA-X is 126.5206
+# MAPE of Williamson's ARIMA-X is 126.5206
 ```
 
 
@@ -632,6 +639,12 @@ clinton_pageviews_daily <- article_pageviews(
 
 clinton_ts_daily <- ts(data = clinton_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 autoplot(window(clinton_ts_daily, start = c(2016, 1), end = c(2017, 1))) + autolayer(window(trump_ts_daily, start = c(2016, 1), end = c(2017, 1)))
+
+# Finding Maximum Count for Trump and Clinton
+## Trump
+df_2016 <- subset(trump_pageviews_daily, substr(date, 1, 4) == "2016")
+df2_2016 <- subset(clinton_pageviews_daily, substr(date, 1, 4) == "2016")
+max(df_2016$views); max(df2_2016$views)
 ```
 
 
