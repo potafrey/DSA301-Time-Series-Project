@@ -85,7 +85,7 @@ obama_month_fitted_a <-forecast(stlf(obama_train_month, method = "arima",lambda 
 accuracy(obama_month_fitted_n, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_month_fitted_d, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_month_fitted_a, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
-# Negative ME from ARIMA model suggests that it tends to underestimate the quantity being predicted but has the smallest RMSE of 10112.8453.
+# Negative ME from ARIMA model suggests that it tends to underestimate the quantity being predicted. However naive seems to give the lowest MAPE of 23.164.
 
 ```
 ## Daily
@@ -98,7 +98,7 @@ obama_daily_fitted_a <-forecast(stlf(obama_train_daily, method = "arima",lambda 
 accuracy(obama_daily_fitted_n, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_daily_fitted_d, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_daily_fitted_a, obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
-# Negative ME from ARIMA model suggests that it tends to underestimate the quantity being predicted, naive has the smallest RMSE of 18175.27471.
+# Negative ME from ARIMA model suggests that it tends to underestimate the quantity being predicted, naive has the smallest MAPE of 79.401
 ```
 
 # Splines
@@ -121,7 +121,7 @@ accuracy(obama_month_fitted_s, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_month_fitted_ns, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_month_fitted_as, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(obama_month_fitted_ds, obama_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
-#Lowest RMSE is surprisingly naive + spline with 11537.08259 though when eyeballing the ARIMA + spline looks closer to the data.
+#Lowest MAPE is surprisingly naive + spline with 31.46659 though when eyeballing the ARIMA + spline looks closer to the data.
 
 # Hence for prediction of pageviews on a daily average, a standard ARIMA model seems to perform better.
 
@@ -166,8 +166,11 @@ autoplot(obama_mstl_fitted) +
 
 accuracy(obama_mstl_fitted,obama_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 # A much higher RMSE of 65549.8241 compared to its non MSTL counterpart.
-```
 
+autoplot(obama_seasonal_monthly)
+autoplot(obama_seasonal_weekly)
+autoplot(obama_seasonal_yearly)
+```
 
 
 #ARIMA Model
@@ -178,11 +181,10 @@ obama_s_adj_arima_fc <- (forecast(obama_arima, h = 730.5))
 plot(obama_s_adj_arima_fc)
 obama_arima_fc <- obama_s_adj_arima_fc$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
 obama_arima_fc <- ts(obama_arima_fc, start = c(2022, 1), frequency = 365.25)
-#autoplot(obama_ts_daily) + 
 autoplot(obama_arima_fc) + autolayer(obama_test_daily)
-MAE(obama_arima_fc, obama_test_daily)
+accuracy(obama_arima_fc, obama_test_daily)
 ```
-MAE of ARIMA model is 55327.6
+MAPE of ARIMA model is 157.8397
 
 
 #ARIMA-X Model
@@ -199,14 +201,14 @@ dem_ts_daily <- ts(data = dem_pageviews_daily$views, start = c(2016,1), frequenc
 
 obama_arimax <- auto.arima(obama_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
-forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean
+forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean 
 forecast_obama <- pmax(ts(forecast_obama, start = c(2022, 1), frequency = 365.25), 0)
-autoplot(obama_test_daily) + autolayer(forecast_obama) + autolayer(obama_arima_fc)
+autoplot(obama_test_daily) + autolayer(forecast_obama)
 forecast_obama
-MAE(forecast_obama, obama_test_daily)
+accuracy(forecast_obama, obama_test_daily)
 
 ```
-MAE of ARIMA-X model is 37774.59, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
+MAPE of ARIMA-X model is 84.44036, which is a significant improvement to ARIMA. We will be using the party pageviews as the exogenous variable to forecast the candidates' pageviews.
 
 
 #Forecasting for different Presidential Candidates in 2024
@@ -267,7 +269,7 @@ accuracy(williamson_month_fitted_n, williamson_test_month)[1,c("ME", "RMSE","MAE
 accuracy(williamson_month_fitted_d, williamson_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(williamson_month_fitted_a, williamson_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# Drift has the smallest RMSE of 3592.49487 
+# Drift has the smallest MAPE of 51.24148
 ```
 
 
@@ -282,7 +284,7 @@ accuracy(williamson_daily_fitted_n, williamson_test_daily)[1,c("ME", "RMSE","MAE
 accuracy(williamson_daily_fitted_d, williamson_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(williamson_daily_fitted_a, williamson_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# ARIMA has the smallest RMSE of 1373.57909. 
+# ARIMA has the smallest MAPE of 34.40452. 
 ```
 ### MSTL
 ```{r}
@@ -316,18 +318,17 @@ autoplot(williamson_mstl_fitted) +
   autolayer(williamson_test_daily)
 
 accuracy(williamson_mstl_fitted,williamson_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
-# RMSE of 7169.7752 and MAE of 2508.3038.
-# ARIMA still has the smaller RMSE.
+# RMSE of 7169.7752 and MAPE of 264.1711.
 ```
 
-### ARIMAX
+### ARIMA-X
 ```{r}
 williamson_arimax <- auto.arima(williamson_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
 forecast_williamson_s_adj <- forecast(williamson_arimax, xreg = dem_ts_daily, h = 730.5) 
 forecast_williamson <- forecast_williamson_s_adj$mean + snaive(williamson_seasonal_yearly, h = 730.5)$mean
 forecast_williamson <- pmax(ts(forecast_williamson, start = c(2022, 1), frequency = 365.25), 0)
 autoplot(williamson_test_daily) + autolayer(forecast_williamson)
-MAE(forecast_williamson, williamson_test_daily)
+accuracy(forecast_williamson, williamson_test_daily)
 
 
 williamson_full <- (mstl(msts(williamson_ts_daily, seasonal.periods = c(7,12,365.25))))
@@ -338,6 +339,7 @@ forecast_williamson_s_adj_full <- forecast(williamson_arimax_full, xreg = dem_ts
 forecast_williamson_full <- forecast_williamson_s_adj_full$mean + snaive(williamson_seasonal_yearly_full, h = 365.25)$mean
 forecast_williamson_full <- pmax(ts(forecast_williamson_full, start = c(2024, 1), frequency = 365.25), 0)
 autoplot(forecast_williamson_full)
+#MAPE of Williamson's ARIMA-X is 147.28
 ```
 
 
@@ -397,26 +399,6 @@ biden_test_month <- window(biden_ts_DA, start = c(2022, 1))
 
 biden_ts_daily <- ts(data = biden_pageviews_daily$views, start = c(2016,1), frequency = 365.25)
 
-
-
-biden_arimax <- auto.arima(biden_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
-forecast_biden_s_adj <- forecast(biden_arimax, xreg = dem_ts_daily, h = 730.5) 
-forecast_biden <- forecast_biden_s_adj$mean + snaive(biden_seasonal_yearly, h = 730.5)$mean
-forecast_biden <- pmax(ts(forecast_biden, start = c(2022, 1), frequency = 365.25), 0)
-forecast_biden
-MAE(forecast_biden, biden_test_daily)
-
-
-biden_full <- (mstl(msts(biden_ts_daily, seasonal.periods = c(7,12,365.25))))
-biden_full_s_adj <- biden_full[,2] + biden_full[,6]
-biden_seasonal_yearly_full <- biden_full[,5]
-biden_arimax_full <- auto.arima(biden_full_s_adj, xreg = dem_ts_daily)
-forecast_biden_s_adj_full <- forecast(biden_arimax_full, xreg = dem_ts_daily, h = 365.25) 
-forecast_biden_full <- forecast_biden_s_adj_full$mean + snaive(biden_seasonal_yearly_full, h = 365.25)$mean
-forecast_biden_full <- pmax(ts(forecast_biden_full, start = c(2024, 1), frequency = 365.25), 0)
-autoplot(forecast_biden_full) + autolayer(biden_ts_daily)
-
-
 ```
 
 ### Benchmark Models
@@ -431,7 +413,7 @@ accuracy(biden_month_fitted_n, biden_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(biden_month_fitted_d, biden_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(biden_month_fitted_a, biden_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# Drift has the smallest RMSE of 10662.25501. 
+# Drift has the smallest MAPE of 24.42426.
 ```
 
 #### Daily
@@ -445,8 +427,9 @@ accuracy(biden_daily_fitted_n, biden_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(biden_daily_fitted_d, biden_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(biden_daily_fitted_a, biden_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# Naive has the smallest RMSE of 36279.2137 
+# Naive has the smallest MAPE of 114.2923
 ```
+
 ### MSTL
 ```{r}
 biden_msts <- msts(biden_train_daily, seasonal.periods = c(7,12,365.25), start = c(2016,01))
@@ -479,10 +462,28 @@ autoplot(biden_mstl_fitted) +
   autolayer(biden_test_daily)
 
 accuracy(biden_mstl_fitted,biden_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
-# RMSE of 166445.0480  and MAE of 130821.5293 .
-# ARIMA still has the smaller RMSE.
+# RMSE of 166445.0480  and MAPE of 483.3171.
 ```
 
+#ARIMA-X
+```{r}
+biden_arimax <- auto.arima(biden_s_adj, xreg = window(dem_ts_daily,start = c(2016, 1), end = c(2021, 12)))
+forecast_biden_s_adj <- forecast(biden_arimax, xreg = dem_ts_daily, h = 730.5) 
+forecast_biden <- forecast_biden_s_adj$mean + snaive(biden_seasonal_yearly, h = 730.5)$mean
+forecast_biden <- pmax(ts(forecast_biden, start = c(2022, 1), frequency = 365.25), 0)
+forecast_biden
+accuracy(forecast_biden, biden_test_daily)
+#MAPE of 204.2786
+
+biden_full <- (mstl(msts(biden_ts_daily, seasonal.periods = c(7,12,365.25))))
+biden_full_s_adj <- biden_full[,2] + biden_full[,6]
+biden_seasonal_yearly_full <- biden_full[,5]
+biden_arimax_full <- auto.arima(biden_full_s_adj, xreg = dem_ts_daily)
+forecast_biden_s_adj_full <- forecast(biden_arimax_full, xreg = dem_ts_daily, h = 365.25) 
+forecast_biden_full <- forecast_biden_s_adj_full$mean + snaive(biden_seasonal_yearly_full, h = 365.25)$mean
+forecast_biden_full <- pmax(ts(forecast_biden_full, start = c(2024, 1), frequency = 365.25), 0)
+autoplot(biden_ts_daily) + autolayer(forecast_biden_full)
+```
 
 ## 4. Donald Trump
 ```{r}
@@ -528,27 +529,6 @@ autoplot(trump_ts_DA) +
 trump_train_month <- window(trump_ts_DA, start = c(2016, 1), end = c(2021, 12))
 trump_test_month <- window(trump_ts_DA, start = c(2022, 1))
 
-
-
-trump_arimax <- auto.arima(trump_s_adj, xreg = window(rep_ts_daily,start = c(2016, 1), end = c(2021, 12)))
-forecast_trump_s_adj <- forecast(trump_arimax, xreg = rep_ts_daily, h = 730.5) 
-forecast_trump <- forecast_trump_s_adj$mean + snaive(trump_seasonal_yearly, h = 730.5)$mean
-forecast_trump <- pmax(ts(forecast_trump, start = c(2022, 1), frequency = 365.25), 0)
-forecast_trump
-MAE(forecast_trump, trump_test_daily)
-
-
-trump_full <- (mstl(msts(trump_ts_daily, seasonal.periods = c(7,12,365.25))))
-trump_full_s_adj <- trump_full[,2] + trump_full[,6]
-trump_seasonal_yearly_full <- trump_full[,5]
-trump_arimax_full <- auto.arima(trump_full_s_adj, xreg = rep_ts_daily)
-forecast_trump_s_adj_full <- forecast(trump_arimax_full, xreg = rep_ts_daily, h = 365.25) 
-forecast_trump_full <- forecast_trump_s_adj_full$mean + snaive(trump_seasonal_yearly_full, h = 365.25)$mean
-forecast_trump_full <- pmax(ts(forecast_trump_full, start = c(2024, 1), frequency = 365.25), 0)
-autoplot(forecast_trump_full) + autolayer(trump_ts_daily)
-
-
-
 ```
 ### Benchmark Models
 #### Monthly
@@ -562,7 +542,7 @@ accuracy(trump_month_fitted_n, trump_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(trump_month_fitted_d, trump_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(trump_month_fitted_a, trump_test_month)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# Drift has the smallest RMSE of 10662.25501. 
+#Naive has the smallest MAPE of 180.7104. 
 ```
 
 #### Daily
@@ -576,7 +556,7 @@ accuracy(trump_daily_fitted_n, trump_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(trump_daily_fitted_d, trump_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 accuracy(trump_daily_fitted_a, trump_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
 
-# Naive has the smallest RMSE of 36279.2137 
+#ARIMA has the smallest MAPE of 272.8312
 ```
 ### MSTL
 ```{r}
@@ -610,12 +590,31 @@ autoplot(trump_mstl_fitted) +
   autolayer(trump_test_daily)
 
 accuracy(trump_mstl_fitted,trump_test_daily)[1,c("ME", "RMSE","MAE","MAPE")]
-# RMSE of 704436.725  and MAE of 130821.5293 .
-# ARIMA still has the smaller RMSE.
+#MAPE of 275.061 .
 ```
 
+#ARIMA-X
+```{r}
+
+trump_arimax <- auto.arima(trump_s_adj, xreg = window(rep_ts_daily,start = c(2016, 1), end = c(2021, 12)))
+forecast_trump_s_adj <- forecast(trump_arimax, xreg = rep_ts_daily, h = 730.5) 
+forecast_trump <- forecast_trump_s_adj$mean + snaive(trump_seasonal_yearly, h = 730.5)$mean
+forecast_trump <- pmax(ts(forecast_trump, start = c(2022, 1), frequency = 365.25), 0)
+forecast_trump
+accuracy(forecast_trump, trump_test_daily)
+#MAPE of 350.961
+
+trump_full <- (mstl(msts(trump_ts_daily, seasonal.periods = c(7,12,365.25))))
+trump_full_s_adj <- trump_full[,2] + trump_full[,6]
+trump_seasonal_yearly_full <- trump_full[,5]
+trump_arimax_full <- auto.arima(trump_full_s_adj, xreg = rep_ts_daily)
+forecast_trump_s_adj_full <- forecast(trump_arimax_full, xreg = rep_ts_daily, h = 365.25) 
+forecast_trump_full <- forecast_trump_s_adj_full$mean + snaive(trump_seasonal_yearly_full, h = 365.25)$mean
+forecast_trump_full <- pmax(ts(forecast_trump_full, start = c(2024, 1), frequency = 365.25), 0)
+autoplot(forecast_trump_full) + autolayer(trump_ts_daily)
 
 
+```
 
 #Data for Hillary Clinton
 ```{r}
