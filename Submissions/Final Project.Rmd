@@ -64,6 +64,8 @@ obama_test_month <- window(obama_ts_DA, start = c(2022, 1))
 obama_train_daily <- window(obama_ts_daily, start = c(2016, 1), end = c(2022, 0))
 obama_test_daily <- window(obama_ts_daily, start = c(2022, 1))
 
+autoplot(decompose(obama_train_month)) + ggtitle("Decomposition of Average Daily Views per Month")
+autoplot(decompose(obama_train_daily)) + ggtitle("Decomposition of Daily Views")
 ```
 ## Decomposition using stlf on month
 ```{r}
@@ -211,7 +213,7 @@ obama_arimax <- auto.arima(obama_s_adj, xreg = window(dem_ts_daily,start = c(201
 forecast_obama_s_adj <- forecast(obama_arimax, xreg = dem_ts_daily, h = 730.5) 
 forecast_obama <- forecast_obama_s_adj$mean + snaive(obama_seasonal_yearly, h = 730.5)$mean 
 forecast_obama <- pmax(ts(forecast_obama, start = c(2022, 1), frequency = 365.25), 0)
-autoplot(obama_test_daily) + autolayer(forecast_obama)
+autoplot(obama_test_daily) + autolayer(forecast_obama) + autolayer(obama_arima_fc)
 forecast_obama
 accuracy(forecast_obama, obama_test_daily)
 
