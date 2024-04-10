@@ -5,7 +5,7 @@ The U.S. Presidential elections, occurring every four years, mark critical junct
 
 In the context of increasingly digital campaign strategies, utilisation of Wikipedia’s webpage API provides a rich source of real-time data & insights into the trends and patterns of the public interests. By examining web traffic, we aim to uncover how the candidates gain public interest along with their campaign strategies & political dynamics. Our focus on the U.S. presidential candidates allows us to hone in on a high-stakes political arena, where public perception and electoral outcomes is of utmost importance to the international economy. 
 
-From the web traffic data from the 2016 elections, it is shown that the two candidates, Donald Trump and Hillary Clinton, had wikipedia pageviews of **6,137,438** and **1,233,122 **respectively. From this statistic we have hypothesized that the politician with the most Wikipedia pageviews would garner the most votes and hence win the election. 
+From the web traffic data from the 2016 elections, it is shown that the two candidates, Donald Trump and Hillary Clinton, had wikipedia pageviews of **6,137,438** and **1,233,122** respectively. From this statistic we have hypothesized that the politician with the most Wikipedia pageviews would garner the most votes and hence win the election. 
 
 Building a robust time-series predictive model allows us to provide valuable insights to political analysts, campaign strategists, and researchers interested in understanding the evolving landscape of American politics as well as identifying key factors that correlate with winning the elections.
 
