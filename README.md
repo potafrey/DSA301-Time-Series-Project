@@ -161,6 +161,10 @@ Refer to Section D of References for detailed MAPE values of each model and each
 
 In conclusion, the findings of this report revealed that ARIMA-X models exhibited good performances for the Obama dataset, which was applicable to the other politicians and their datasets as well. While the test errors provide a good indication of how the models perform with in-sample data, the errors should only be used as a guideline and ultimately require some contextual application. In the case of forecasting pageviews, despite benchmark models performing well, we chose not to use them as they fail at capturing the spikes occurring around the election season. We believe ARIMA-X is a better model despite a higher MAPE as each election there are different candidates. We decided to go with the candidates’ respective parties as the exogenous variables as the U.S. generally exhibits partisan views on presidential candidates, thus we believe that the party serves as a good influence for the respective pageviews.
 
+Moving forward, extending ARIMA, ARIMAX models to include other predictors such as social media sentiment indices, economic indicators, or significant political events. This could provide a more nuanced understanding of the factors driving pageviews and improving forecasting accuracy.
+For time series forecasting tasks like predicting website pageviews, neural network architectures that can capture sequential dependencies and patterns over time are particularly effective. Long Short-Term Memory (LSTM) Networks are a good type as they overcome the vanishing gradient problem, allowing them to learn long-term dependencies. LSTMs can capture the seasonal and trend components in pageview data, learning from past traffic patterns to predict future pageviews, which may be influenced by factors like seasonal trends, promotions, or events.
+
+
 On a fun sidenote, here is our predicted probability for each candidate winning the next presidential election, based purely on candidates’ pageviews: 
 
 
